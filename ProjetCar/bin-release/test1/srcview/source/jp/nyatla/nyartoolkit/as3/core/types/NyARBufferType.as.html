@@ -1,0 +1,155 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>NyARBufferType.as</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../../SourceStyles.css"/>
+</head>
+
+<body><pre><span class="ActionScriptComment">/* 
+ * PROJECT: NyARToolkitAS3
+ * --------------------------------------------------------------------------------
+ * This work is based on the original ARToolKit developed by
+ *   Hirokazu Kato
+ *   Mark Billinghurst
+ *   HITLab, University of Washington, Seattle
+ * http://www.hitl.washington.edu/artoolkit/
+ *
+ * The NyARToolkitAS3 is AS3 edition ARToolKit class library.
+ * Copyright (C)2010 Ryo Iizuka
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+ * 
+ * For further information please contact.
+ *    http://nyatla.jp/nyatoolkit/
+ *    &lt;airmail(at)ebony.plala.or.jp&gt; or &lt;nyatla(at)nyatla.jp&gt;
+ * 
+ */</span>
+<span class="ActionScriptpackage">package</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">types</span>
+<span class="ActionScriptBracket/Brace">{</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptclass">class</span> <span class="ActionScriptDefault_Text">NyARBufferType</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptReserved">private</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">T_BYTE1D</span>:<span class="ActionScriptDefault_Text">int</span> <span class="ActionScriptOperator">=</span>0x00010000;
+        <span class="ActionScriptReserved">private</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">T_INT2D</span>:<span class="ActionScriptDefault_Text">int</span>  <span class="ActionScriptOperator">=</span>0x00020000;
+        <span class="ActionScriptReserved">private</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">T_SHORT1D</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptOperator">=</span>0x00030000;
+        <span class="ActionScriptReserved">private</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">T_INT1D</span>:<span class="ActionScriptDefault_Text">int</span>  <span class="ActionScriptOperator">=</span>0x00040000;
+        <span class="ActionScriptReserved">private</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">T_OBJECT</span>:<span class="ActionScriptDefault_Text">int</span> <span class="ActionScriptOperator">=</span>0x00100000;
+        <span class="ActionScriptReserved">private</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">T_USER</span>:<span class="ActionScriptDefault_Text">int</span>   <span class="ActionScriptOperator">=</span>0x00FF0000;
+        <span class="ActionScriptComment">//  24-31(8)予約
+</span>        <span class="ActionScriptComment">//  16-27(8)型ID
+</span>        <span class="ActionScriptComment">//      00:無効/01:byte[]/02:int[][]/03:short[]
+</span>        <span class="ActionScriptComment">//  08-15(8)ビットフォーマットID
+</span>        <span class="ActionScriptComment">//      00:24bit/01:32bit/02:16bit
+</span>        <span class="ActionScriptComment">//  00-07(8)型番号
+</span>        <span class="ActionScriptComment">//
+</span>        <span class="ActionScriptASDoc">/**
+         * RGB24フォーマットで、全ての画素が0
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">NULL_ALLZERO</span>:<span class="ActionScriptDefault_Text">int</span> <span class="ActionScriptOperator">=</span> 0x00000001;
+        <span class="ActionScriptASDoc">/**
+         * USER - USER+0xFFFFはユーザー定義型。実験用に。
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">USER_DEFINE</span>:<span class="ActionScriptDefault_Text">int</span>  <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">T_USER</span>;
+
+        <span class="ActionScriptASDoc">/**
+         * byte[]で、R8G8B8の24ビットで画素が格納されている。
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">BYTE1D_R8G8B8_24</span>:<span class="ActionScriptDefault_Text">int</span>   <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">T_BYTE1D</span><span class="ActionScriptOperator">|</span>0x0001;
+        <span class="ActionScriptASDoc">/**
+         * byte[]で、B8G8R8の24ビットで画素が格納されている。
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">BYTE1D_B8G8R8_24</span>:<span class="ActionScriptDefault_Text">int</span>   <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">T_BYTE1D</span><span class="ActionScriptOperator">|</span>0x0002;
+        <span class="ActionScriptASDoc">/**
+         * byte[]で、R8G8B8X8の32ビットで画素が格納されている。
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">BYTE1D_B8G8R8X8_32</span>:<span class="ActionScriptDefault_Text">int</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">T_BYTE1D</span><span class="ActionScriptOperator">|</span>0x0101;
+        <span class="ActionScriptASDoc">/**
+         * byte[]で、X8R8G8B8の32ビットで画素が格納されている。
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">BYTE1D_X8R8G8B8_32</span>:<span class="ActionScriptDefault_Text">int</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">T_BYTE1D</span><span class="ActionScriptOperator">|</span>0x0102;
+
+        <span class="ActionScriptASDoc">/**
+         * byte[]で、RGB565の16ビット(little/big endian)で画素が格納されている。
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">BYTE1D_R5G6B5_16LE</span>:<span class="ActionScriptDefault_Text">int</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">T_BYTE1D</span><span class="ActionScriptOperator">|</span>0x0201;
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">BYTE1D_R5G6B5_16BE</span>:<span class="ActionScriptDefault_Text">int</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">T_BYTE1D</span><span class="ActionScriptOperator">|</span>0x0202;
+        <span class="ActionScriptASDoc">/**
+         * short[]で、RGB565の16ビット(little/big endian)で画素が格納されている。
+         */</span>    
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">WORD1D_R5G6B5_16LE</span>:<span class="ActionScriptDefault_Text">int</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">T_SHORT1D</span><span class="ActionScriptOperator">|</span>0x0201;
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">WORD1D_R5G6B5_16BE</span>:<span class="ActionScriptDefault_Text">int</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">T_SHORT1D</span><span class="ActionScriptOperator">|</span>0x0202;
+
+        
+        <span class="ActionScriptASDoc">/**
+         * int[][]で特に値範囲を定めない
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">INT2D</span>:<span class="ActionScriptDefault_Text">int</span>        <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">T_INT2D</span><span class="ActionScriptOperator">|</span>0x0000;
+        <span class="ActionScriptASDoc">/**
+         * int[][]で0-255のグレイスケール画像
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">INT2D_GRAY_8</span>:<span class="ActionScriptDefault_Text">int</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">T_INT2D</span><span class="ActionScriptOperator">|</span>0x0001;
+        <span class="ActionScriptASDoc">/**
+         * int[][]で0/1の2値画像
+         * これは、階調値1bitのBUFFERFORMAT_INT2D_GRAY_1と同じです。
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">INT2D_BIN_8</span>:<span class="ActionScriptDefault_Text">int</span>  <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">T_INT2D</span><span class="ActionScriptOperator">|</span>0x0002;
+
+        <span class="ActionScriptASDoc">/**
+         * int[]で特に値範囲を定めない
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">INT1D</span>:<span class="ActionScriptDefault_Text">int</span>        <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">T_INT1D</span><span class="ActionScriptOperator">|</span>0x0000;
+        <span class="ActionScriptASDoc">/**
+         * int[]で0-255のグレイスケール画像
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">INT1D_GRAY_8</span>:<span class="ActionScriptDefault_Text">int</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">T_INT1D</span><span class="ActionScriptOperator">|</span>0x0001;
+        <span class="ActionScriptASDoc">/**
+         * int[]で0/1の2値画像
+         * これは、階調1bitのINT1D_GRAY_1と同じです。
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">INT1D_BIN_8</span>:<span class="ActionScriptDefault_Text">int</span>  <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">T_INT1D</span><span class="ActionScriptOperator">|</span>0x0002;
+        
+        
+        <span class="ActionScriptASDoc">/**
+         * int[]で、XRGB32の32ビットで画素が格納されている。
+         */</span>    
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">INT1D_X8R8G8B8_32</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptOperator">=</span><span class="ActionScriptDefault_Text">T_INT1D</span><span class="ActionScriptOperator">|</span>0x0102;
+
+        <span class="ActionScriptASDoc">/**
+         * H:9bit(0-359),S:8bit(0-255),V(0-255)
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">INT1D_X7H9S8V8_32</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptOperator">=</span><span class="ActionScriptDefault_Text">T_INT1D</span><span class="ActionScriptOperator">|</span>0x0103;
+        
+
+        <span class="ActionScriptASDoc">/**
+         * プラットフォーム固有オブジェクト
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">OBJECT_Java</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">T_OBJECT</span><span class="ActionScriptOperator">|</span>0x0100;
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">OBJECT_CS</span>:<span class="ActionScriptDefault_Text">int</span>  <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">T_OBJECT</span><span class="ActionScriptOperator">|</span>0x0200;
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">OBJECT_AS3</span>:<span class="ActionScriptDefault_Text">int</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">T_OBJECT</span><span class="ActionScriptOperator">|</span>0x0300;
+        
+        <span class="ActionScriptASDoc">/**
+         * JavaのBufferedImageを格納するラスタ
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">OBJECT_Java_BufferedImage</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">OBJECT_Java</span><span class="ActionScriptOperator">|</span>0x01;
+        
+        
+        <span class="ActionScriptASDoc">/**
+         * ActionScript3のBitmapDataを格納するラスタ
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">OBJECT_AS3_BitmapData</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">OBJECT_AS3</span><span class="ActionScriptOperator">|</span>0x01;
+    <span class="ActionScriptBracket/Brace">}</span>
+
+<span class="ActionScriptBracket/Brace">}</span></pre></body>
+</html>

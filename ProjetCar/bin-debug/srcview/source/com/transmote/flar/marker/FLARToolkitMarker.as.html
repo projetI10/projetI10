@@ -1,0 +1,200 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>FLARToolkitMarker.as</title>
+<link rel="stylesheet" type="text/css" href="../../../../../SourceStyles.css"/>
+</head>
+
+<body><pre><span class="ActionScriptComment">/* 
+ * PROJECT: FLARManager
+ * http://transmote.com/flar
+ * Copyright 2009, Eric Socolofsky
+ * --------------------------------------------------------------------------------
+ * This work complements FLARToolkit, developed by Saqoosha as part of the Libspark project.
+ *    http://www.libspark.org/wiki/saqoosha/FLARToolKit
+ * FLARToolkit is Copyright (C)2008 Saqoosha,
+ * and is ported from NYARToolkit, which is ported from ARToolkit.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this framework; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * 
+ * For further information please contact:
+ *    &lt;eric(at)transmote.com&gt;
+ *    http://transmote.com/flar
+ * 
+ */</span>
+<span class="ActionScriptpackage">package</span> <span class="ActionScriptDefault_Text">com</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">transmote</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flar</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">marker</span> <span class="ActionScriptBracket/Brace">{</span>
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">__AS3__</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">vec</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">Vector</span>;
+    
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">com</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">transmote</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flar</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">pattern</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">FLARPattern</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">com</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">transmote</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flar</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">source</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">IFLARSource</span>;
+    
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">geom</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">Matrix3D</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">geom</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">Point</span>;
+    
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">squaredetect</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">NyARSquare</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">types</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">NyARDoublePoint2d</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">types</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">NyARLinear</span>;
+    
+    <span class="ActionScriptASDoc">/**
+     * Container for information about a marker detected by FLARToolkit, including:
+     * &lt;p&gt;
+     * &lt;ul&gt;
+     * &lt;li&gt;pattern and session ids&lt;/li&gt;
+     * &lt;li&gt;centerpoint of marker&lt;/li&gt;
+     * &lt;li&gt;corners of marker outline&lt;/li&gt;
+     * &lt;li&gt;Vector3D instance that describes x, y, and z location, and rotation (in the z-axis) of marker&lt;/li&gt;
+     * &lt;li&gt;rotation of marker around x, y, and z axes&lt;/li&gt;
+     * &lt;/ul&gt;
+     * &lt;/p&gt;
+     * 
+     * @author    Eric Socolofsky
+     * @url        http://transmote.com/flar/
+     * @see        com.transmote.flar.marker.FLARMarkerEvent
+     */</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptclass">class</span> <span class="ActionScriptDefault_Text">FLARToolkitMarker</span> <span class="ActionScriptReserved">extends</span> <span class="ActionScriptDefault_Text">FLARMarker</span> <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptReserved">internal</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">_confidence</span>:<span class="ActionScriptDefault_Text">Number</span>;
+        <span class="ActionScriptReserved">internal</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">_direction</span>:<span class="ActionScriptDefault_Text">int</span>;
+        <span class="ActionScriptReserved">internal</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">_flarSquare</span>:<span class="ActionScriptDefault_Text">NyARSquare</span>;
+        <span class="ActionScriptReserved">internal</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">_flarPattern</span>:<span class="ActionScriptDefault_Text">FLARPattern</span>;
+        
+        <span class="ActionScriptASDoc">/**
+         * Constructor.
+         * 
+         * @param    transformMatrix        A Matrix3D object that describes the orientation of the detected marker relative to the viewer.
+         *                                 Apply this Matrix3D to a 3D model to make it appear tethered to the marker.
+         * @param    flarSource            The IFLARSource from which the marker's image was extracted by the current tracker.
+         * @param    flarPattern            The FLARPattern that represents the detected marker's pattern.
+         * @param    patternId            ID of the pattern of the detected marker.
+         * @param    direction            The closest orthographic orientation of detected marker (up/down/left/right).
+         * @param    square                The NyARSquare instance used to create this FLARMarker instance.
+         * @param    confidence            The value assigned by FLARToolkit to each detected marker.
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">FLARToolkitMarker</span> <span class="ActionScriptBracket/Brace">(</span>
+            <span class="ActionScriptDefault_Text">transformMatrix</span>:<span class="ActionScriptDefault_Text">Matrix3D</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">flarSource</span>:<span class="ActionScriptDefault_Text">IFLARSource</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">flarPattern</span>:<span class="ActionScriptDefault_Text">FLARPattern</span><span class="ActionScriptOperator">,</span>
+            <span class="ActionScriptDefault_Text">patternId</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">direction</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">square</span>:<span class="ActionScriptDefault_Text">NyARSquare</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">confidence</span>:<span class="ActionScriptDefault_Text">Number</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptBracket/Brace">{</span>
+            
+            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_direction</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">direction</span>;
+            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_flarSquare</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">square</span>;
+            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_confidence</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">confidence</span>;
+            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_flarPattern</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">flarPattern</span>;
+            
+            <span class="ActionScriptReserved">super</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">patternId</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">transformMatrix</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">flarSource</span><span class="ActionScriptBracket/Brace">)</span>;
+            
+            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">calcCorners</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+        
+        
+        <span class="ActionScriptComment">//-----&lt;ACCESSORS&gt;-------------------------------------------//
+</span>        <span class="ActionScriptASDoc">/**
+         * 'Confidence' is a value assigned by FLARToolkit to each detected marker,
+         * that describes the algorithm's perceived accuracy of the pattern match.
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptReserved">get</span> <span class="ActionScriptDefault_Text">confidence</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptDefault_Text">Number</span> <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptReserved">return</span> <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_confidence</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+    
+        <span class="ActionScriptASDoc">/**
+         * The closest orthographic orientation of detected marker.
+         * value between 0 and 3, inclusive:
+         * 0: up
+         * 1: left
+         * 2: down
+         * 3: right
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptReserved">get</span> <span class="ActionScriptDefault_Text">direction</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptDefault_Text">int</span> <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptReserved">return</span> <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_direction</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+        
+        <span class="ActionScriptASDoc">/**
+         * The NyARSquare instance used to create this FLARMarker instance.
+         * Can be accessed if direct access to FLARToolkit output is desired;
+         * no downsampling correction is applied.
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptReserved">get</span> <span class="ActionScriptDefault_Text">flarSquare</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptDefault_Text">NyARSquare</span> <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptReserved">return</span> <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_flarSquare</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+        <span class="ActionScriptComment">//-----&lt;END: ACCESSORS&gt;--------------------------------------//
+</span>        
+        
+        
+        <span class="ActionScriptComment">//-----&lt;PUBLIC METHODS&gt;--------------------------------------//
+</span>        <span class="ActionScriptASDoc">/**
+         * @inheritDoc
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">override</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">copy</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">otherMarker</span>:<span class="ActionScriptDefault_Text">FLARMarker</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptReserved">void</span> <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptReserved">super</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">copy</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">otherMarker</span><span class="ActionScriptBracket/Brace">)</span>;
+            
+            <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">otherFLARToolkitMarker</span>:<span class="ActionScriptDefault_Text">FLARToolkitMarker</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">otherMarker</span> <span class="ActionScriptReserved">as</span> <span class="ActionScriptDefault_Text">FLARToolkitMarker</span>;
+            <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">otherFLARToolkitMarker</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptBracket/Brace">{</span>
+                <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_direction</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">otherFLARToolkitMarker</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_direction</span>;
+                <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_flarSquare</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">otherFLARToolkitMarker</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_flarSquare</span>;
+                <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_confidence</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">otherFLARToolkitMarker</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_confidence</span>;
+                <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_flarPattern</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">otherFLARToolkitMarker</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_flarPattern</span>;
+                
+            <span class="ActionScriptBracket/Brace">}</span>
+        <span class="ActionScriptBracket/Brace">}</span>
+        
+        <span class="ActionScriptASDoc">/**
+         * @inheritDoc
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">override</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">dispose</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptReserved">void</span> <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptReserved">super</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">dispose</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_flarSquare</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptReserved">null</span>;
+            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_flarPattern</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptReserved">null</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+        <span class="ActionScriptComment">//-----&lt;END PUBLIC METHODS&gt;----------------------------------//
+</span>        
+        
+        
+        <span class="ActionScriptComment">//-----&lt;PROTECTED/PRIVATE METHODS&gt;---------------------------//
+</span>        <span class="ActionScriptReserved">protected</span> <span class="ActionScriptReserved">override</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">resetAllCalculations</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptReserved">void</span> <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptReserved">super</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">resetAllCalculations</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">calcCorners</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+        
+        <span class="ActionScriptReserved">protected</span> <span class="ActionScriptReserved">override</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">mirror</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptReserved">void</span> <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptReserved">super</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">mirror</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+            
+            <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">sourceWidth</span>:<span class="ActionScriptDefault_Text">Number</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_flarSource</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">sourceSize</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">width</span>;
+            
+            <span class="ActionScriptComment">// mirror FLARSquare
+</span>            <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">i</span>:<span class="ActionScriptDefault_Text">int</span> <span class="ActionScriptOperator">=</span> 4;
+            <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">flarCorner</span>:<span class="ActionScriptDefault_Text">NyARDoublePoint2d</span>;
+            <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">flarLine</span>:<span class="ActionScriptDefault_Text">NyARLinear</span>;
+            <span class="ActionScriptReserved">while</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i</span><span class="ActionScriptOperator">--</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptBracket/Brace">{</span>
+                <span class="ActionScriptDefault_Text">flarCorner</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">NyARDoublePoint2d</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flarSquare</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">sqvertex</span><span class="ActionScriptBracket/Brace">[</span><span class="ActionScriptDefault_Text">i</span><span class="ActionScriptBracket/Brace">]</span><span class="ActionScriptBracket/Brace">)</span>;
+                <span class="ActionScriptDefault_Text">flarCorner</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">x</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">sourceWidth</span> <span class="ActionScriptOperator">-</span> <span class="ActionScriptDefault_Text">flarCorner</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">x</span>;
+                
+                <span class="ActionScriptComment">// NOTE: flarLine mirroring is untested.
+</span>                <span class="ActionScriptDefault_Text">flarLine</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">NyARLinear</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flarSquare</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">line</span><span class="ActionScriptBracket/Brace">[</span><span class="ActionScriptDefault_Text">i</span><span class="ActionScriptBracket/Brace">]</span><span class="ActionScriptBracket/Brace">)</span>;
+                <span class="ActionScriptDefault_Text">flarLine</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">dx</span> <span class="ActionScriptOperator">*=</span> <span class="ActionScriptOperator">-</span>1;
+            <span class="ActionScriptBracket/Brace">}</span>
+        <span class="ActionScriptBracket/Brace">}</span>
+        
+        <span class="ActionScriptReserved">private</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">calcCorners</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptReserved">void</span> <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_corners</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">Vector</span><span class="ActionScriptBracket/Brace">.&lt;</span><span class="ActionScriptDefault_Text">Point</span><span class="ActionScriptBracket/Brace">&gt;</span><span class="ActionScriptBracket/Brace">(</span>4<span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">i</span>:<span class="ActionScriptDefault_Text">int</span> <span class="ActionScriptOperator">=</span> 4;
+            <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">flarCorner</span>:<span class="ActionScriptDefault_Text">NyARDoublePoint2d</span>;
+            <span class="ActionScriptReserved">while</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i</span><span class="ActionScriptOperator">--</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptBracket/Brace">{</span>
+                <span class="ActionScriptDefault_Text">flarCorner</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">NyARDoublePoint2d</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flarSquare</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">sqvertex</span><span class="ActionScriptBracket/Brace">[</span><span class="ActionScriptDefault_Text">i</span><span class="ActionScriptBracket/Brace">]</span><span class="ActionScriptBracket/Brace">)</span>;
+                <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_corners</span><span class="ActionScriptBracket/Brace">[</span><span class="ActionScriptDefault_Text">i</span><span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">Point</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">flarCorner</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">x</span> <span class="ActionScriptOperator">/</span> <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_flarSource</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">trackerToDisplayRatio</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">flarCorner</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">y</span> <span class="ActionScriptOperator">/</span> <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_flarSource</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">trackerToDisplayRatio</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptBracket/Brace">}</span>
+        <span class="ActionScriptBracket/Brace">}</span>
+        <span class="ActionScriptComment">//-----&lt;END PROTECTED/PRIVATE METHODS&gt;-----------------------//
+</span>    <span class="ActionScriptBracket/Brace">}</span>
+<span class="ActionScriptBracket/Brace">}</span></pre></body>
+</html>

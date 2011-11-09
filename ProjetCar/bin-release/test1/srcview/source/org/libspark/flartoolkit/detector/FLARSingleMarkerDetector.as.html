@@ -1,0 +1,257 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>FLARSingleMarkerDetector.as</title>
+<link rel="stylesheet" type="text/css" href="../../../../../SourceStyles.css"/>
+</head>
+
+<body><pre><span class="ActionScriptComment">/* 
+ * PROJECT: FLARToolKit
+ * --------------------------------------------------------------------------------
+ * This work is based on the NyARToolKit developed by
+ *   R.Iizuka (nyatla)
+ * http://nyatla.jp/nyatoolkit/
+ *
+ * The FLARToolKit is ActionScript 3.0 version ARToolkit class library.
+ * Copyright (C)2008 Saqoosha
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+ * 
+ * For further information please contact.
+ *    http://www.libspark.org/wiki/saqoosha/FLARToolKit
+ *    &lt;saq(at)saqoosha.net&gt;
+ * 
+ */</span>
+<span class="ActionScriptpackage">package</span> <span class="ActionScriptDefault_Text">org</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">libspark</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">detector</span>
+<span class="ActionScriptBracket/Brace">{</span>
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">display</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">match</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">pickup</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">raster</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">raster</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">rgb</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">rasterfilter</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">rgb2bin</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">rasterreader</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">squaredetect</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">transmat</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">types</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">org</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">libspark</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">org</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">libspark</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">org</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">libspark</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">labeling</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">fllabeling</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">FLARLabeling</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">org</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">libspark</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">param</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">org</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">libspark</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">raster</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">org</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">libspark</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">raster</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">rgb</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">org</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">libspark</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">rasterfilter</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">rgb2bin</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">org</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">libspark</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">squaredetect</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">org</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">libspark</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">transmat</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptclass">class</span> <span class="ActionScriptDefault_Text">FLARSingleMarkerDetector</span>
+    <span class="ActionScriptBracket/Brace">{</span>    
+        <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">_is_continue</span>:<span class="ActionScriptDefault_Text">Boolean</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptReserved">false</span>;
+        <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">_square_detect</span>:<span class="ActionScriptDefault_Text">FLARSquareContourDetector</span>;
+        <span class="ActionScriptReserved">protected</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">_transmat</span>:<span class="ActionScriptDefault_Text">INyARTransMat</span>;
+        <span class="ActionScriptComment">//画処理用
+</span>        <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">_bin_raster</span>:<span class="ActionScriptDefault_Text">FLARBinRaster</span>;
+        <span class="ActionScriptReserved">protected</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">_tobin_filter</span>:<span class="ActionScriptDefault_Text">INyARRasterFilter_Rgb2Bin</span>;
+        <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">_detect_cb</span>:<span class="ActionScriptDefault_Text">SingleDetectSquareCB</span>;
+        <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">_offset</span>:<span class="ActionScriptDefault_Text">NyARRectOffset</span>; 
+
+
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">FLARSingleMarkerDetector</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_ref_param</span>:<span class="ActionScriptDefault_Text">FLARParam</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">i_ref_code</span>:<span class="ActionScriptDefault_Text">FLARCode</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">i_marker_width</span>:<span class="ActionScriptDefault_Text">Number</span><span class="ActionScriptBracket/Brace">)</span>
+        <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">th</span>:<span class="ActionScriptDefault_Text">INyARRasterFilter_Rgb2Bin</span><span class="ActionScriptOperator">=</span><span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">FLARRasterFilter_Threshold</span><span class="ActionScriptBracket/Brace">(</span>100<span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">patt_inst</span>:<span class="ActionScriptDefault_Text">NyARColorPatt_Perspective_O2</span>;
+            <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">sqdetect_inst</span>:<span class="ActionScriptDefault_Text">FLARSquareContourDetector</span>;
+            <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">transmat_inst</span>:<span class="ActionScriptDefault_Text">INyARTransMat</span>;
+            
+            <span class="ActionScriptComment">// 枠線の割合(ARToolKit標準と同じなら、25 -&gt; 1.0系と数値の扱いが異なるので注意！)
+</span>            <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">markerWidthByDec</span>:<span class="ActionScriptDefault_Text">Number</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptBracket/Brace">(</span>100 <span class="ActionScriptOperator">-</span> <span class="ActionScriptDefault_Text">i_ref_code</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">markerPercentWidth</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptOperator">/</span> 2;
+            <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">markerHeightByDec</span>:<span class="ActionScriptDefault_Text">Number</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptBracket/Brace">(</span>100 <span class="ActionScriptOperator">-</span> <span class="ActionScriptDefault_Text">i_ref_code</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">markerPercentHeight</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptOperator">/</span> 2;
+
+            <span class="ActionScriptComment">//評価パターンのホルダを作成
+</span>            <span class="ActionScriptComment">// NyARColorPatt_Perspective_O2のパラメータ
+</span>            <span class="ActionScriptComment">// 第1,2パラ…縦横の解像度(patデータ作ったときの分割数)
+</span>            <span class="ActionScriptComment">// 第3パラ…1ピクセルあたりの縦横サンプリング数。2なら2x2=4ポイントをサンプリングする。 
+</span>            <span class="ActionScriptComment">//       1,2,4,任意の数値のいずれか。値が大きいほど一致率ＵＰ、フレームレート低下。
+</span>            <span class="ActionScriptComment">//       解像度16、サンプリング数4がデフォルト。解像度が大きい場合は、サンプリング数を下げることでフレームレートの低下を回避できる。
+</span>            <span class="ActionScriptComment">// 第4パラ…エッジ幅の割合(ARToolKit標準と同じなら、25)-&gt;1.0系と数値の扱いが異なるので注意！
+</span>            <span class="ActionScriptDefault_Text">patt_inst</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">NyARColorPatt_Perspective_O2</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_ref_code</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">getWidth</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">i_ref_code</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">getHeight</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptOperator">,</span> 4<span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">markerWidthByDec</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptComment">// 縦横のエッジの割合が異なる場合にも対応できます。
+</span>            <span class="ActionScriptDefault_Text">patt_inst</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">setEdgeSizeByPercent</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">markerWidthByDec</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">markerHeightByDec</span><span class="ActionScriptOperator">,</span> 4<span class="ActionScriptBracket/Brace">)</span>;
+<span class="ActionScriptComment">//            trace('w:'+markerWidthByDec+'/h:'+markerHeightByDec);
+</span>
+            <span class="ActionScriptDefault_Text">sqdetect_inst</span><span class="ActionScriptOperator">=</span><span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">FLARSquareContourDetector</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_ref_param</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">getScreenSize</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptDefault_Text">transmat_inst</span><span class="ActionScriptOperator">=</span><span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">NyARTransMat</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_ref_param</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptDefault_Text">initInstance</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">patt_inst</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">sqdetect_inst</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">transmat_inst</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">th</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">i_ref_param</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">i_ref_code</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">i_marker_width</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptReserved">return</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+        <span class="ActionScriptReserved">protected</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">initInstance</span><span class="ActionScriptBracket/Brace">(</span>
+            <span class="ActionScriptDefault_Text">i_patt_inst</span>:<span class="ActionScriptDefault_Text">INyARColorPatt</span><span class="ActionScriptOperator">,</span>
+            <span class="ActionScriptDefault_Text">i_sqdetect_inst</span>:<span class="ActionScriptDefault_Text">FLARSquareContourDetector</span><span class="ActionScriptOperator">,</span>
+            <span class="ActionScriptDefault_Text">i_transmat_inst</span>:<span class="ActionScriptDefault_Text">INyARTransMat</span><span class="ActionScriptOperator">,</span>
+            <span class="ActionScriptDefault_Text">i_filter</span>:<span class="ActionScriptDefault_Text">INyARRasterFilter_Rgb2Bin</span><span class="ActionScriptOperator">,</span>
+            <span class="ActionScriptDefault_Text">i_ref_param</span>:<span class="ActionScriptDefault_Text">FLARParam</span><span class="ActionScriptOperator">,</span>
+            <span class="ActionScriptDefault_Text">i_ref_code</span>:<span class="ActionScriptDefault_Text">FLARCode</span><span class="ActionScriptOperator">,</span>
+            <span class="ActionScriptDefault_Text">i_marker_width</span>:<span class="ActionScriptDefault_Text">Number</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptReserved">void</span>
+        <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">scr_size</span>:<span class="ActionScriptDefault_Text">NyARIntSize</span><span class="ActionScriptOperator">=</span><span class="ActionScriptDefault_Text">i_ref_param</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">getScreenSize</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptComment">// 解析オブジェクトを作る
+</span>            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_square_detect</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">i_sqdetect_inst</span>;
+            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_transmat</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">i_transmat_inst</span>;
+            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_tobin_filter</span><span class="ActionScriptOperator">=</span><span class="ActionScriptDefault_Text">i_filter</span>;
+            <span class="ActionScriptComment">//２値画像バッファを作る
+</span>            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_bin_raster</span><span class="ActionScriptOperator">=</span><span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">FLARBinRaster</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">scr_size</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">w</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">scr_size</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">h</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptComment">//_detect_cb
+</span>            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_detect_cb</span><span class="ActionScriptOperator">=</span><span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">SingleDetectSquareCB</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_patt_inst</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">i_ref_code</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">i_ref_param</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptComment">//オフセットを作成
+</span>            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_offset</span><span class="ActionScriptOperator">=</span><span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">NyARRectOffset</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_offset</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">setSquare</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_marker_width</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptReserved">return</span>;
+            
+        <span class="ActionScriptBracket/Brace">}</span>
+        
+        <span class="ActionScriptASDoc">/**
+         * i_imageにマーカー検出処理を実行し、結果を記録します。
+         * 
+         * @param i_raster
+         * マーカーを検出するイメージを指定します。イメージサイズは、カメラパラメータ
+         * と一致していなければなりません。
+         * @return マーカーが検出できたかを真偽値で返します。
+         * @throws NyARException
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">detectMarkerLite</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_raster</span>:<span class="ActionScriptDefault_Text">FLARRgbRaster_BitmapData</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">i_threshold</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptDefault_Text">Boolean</span>
+        <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptDefault_Text">FLARRasterFilter_Threshold</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_tobin_filter</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">setThreshold</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_threshold</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptComment">//サイズチェック
+</span>            <span class="ActionScriptReserved">if</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptOperator">!</span><span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_bin_raster</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">getSize</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">isEqualSize_NyARIntSize</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_raster</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">getSize</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">{</span>
+                <span class="ActionScriptReserved">throw</span> <span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">FLARException</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptBracket/Brace">}</span>
+
+            <span class="ActionScriptComment">//ラスタを２値イメージに変換する.
+</span>            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_tobin_filter</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">doFilter</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_raster</span><span class="ActionScriptOperator">,</span><span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_bin_raster</span><span class="ActionScriptBracket/Brace">)</span>;
+
+            <span class="ActionScriptComment">//コールバックハンドラの準備
+</span>            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_detect_cb</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">init</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_raster</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptComment">//矩形を探す(戻り値はコールバック関数で受け取る。)
+</span>            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_square_detect</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">detectMarkerCB</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_bin_raster</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">_detect_cb</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptReserved">if</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_detect_cb</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">confidence</span><span class="ActionScriptOperator">==</span>0<span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">{</span>
+                <span class="ActionScriptReserved">return</span> <span class="ActionScriptReserved">false</span>;
+            <span class="ActionScriptBracket/Brace">}</span>
+            <span class="ActionScriptReserved">return</span> <span class="ActionScriptReserved">true</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+        <span class="ActionScriptASDoc">/**
+         * 検出したマーカーの変換行列を計算して、o_resultへ値を返します。
+         * 直前に実行したdetectMarkerLiteが成功していないと使えません。
+         * 
+         * @param o_result
+         * 変換行列を受け取るオブジェクトを指定します。
+         * @throws NyARException
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">getTransformMatrix</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">o_result</span>:<span class="ActionScriptDefault_Text">FLARTransMatResult</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptReserved">void</span>
+        <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptComment">// 一番一致したマーカーの位置とかその辺を計算
+</span>            <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_is_continue</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptBracket/Brace">{</span>
+                <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_transmat</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">transMatContinue</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_detect_cb</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">square</span><span class="ActionScriptOperator">,</span><span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_offset</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">o_result</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptBracket/Brace">}</span> <span class="ActionScriptReserved">else</span> <span class="ActionScriptBracket/Brace">{</span>
+                <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_transmat</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">transMat</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_detect_cb</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">square</span><span class="ActionScriptOperator">,</span><span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_offset</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">o_result</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptBracket/Brace">}</span>
+            <span class="ActionScriptReserved">return</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+        <span class="ActionScriptASDoc">/**
+         * 検出したマーカーの一致度を返します。
+         * 
+         * @return マーカーの一致度を返します。0～1までの値をとります。 一致度が低い場合には、誤認識の可能性が高くなります。
+         * @throws NyARException
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">getConfidence</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptDefault_Text">Number</span>
+        <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptReserved">return</span> <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_detect_cb</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">confidence</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+        
+        <span class="ActionScriptASDoc">/**
+         * 検出したマーカーの方位を返します。
+         * 0,1,2,3の何れかを返します。
+         * 
+         * @return Returns whether any of 0,1,2,3.
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">getDirection</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptDefault_Text">int</span>
+        <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptReserved">return</span> <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_detect_cb</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">direction</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+        
+        <span class="ActionScriptASDoc">/**
+         * 検出した FLARSquare 1 個返す。検出できなかったら null。
+         * @return Total return detected FLARSquare 1. Detection Dekinakattara null.
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">getSquare</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptDefault_Text">NyARSquare</span>
+        <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptReserved">return</span> <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_detect_cb</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">square</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+        
+        <span class="ActionScriptASDoc">/**
+         * getTransmationMatrixの計算モードを設定します。 初期値はTRUEです。
+         * 
+         * @param i_is_continue
+         * TRUEなら、transMatCont互換の計算をします。 FALSEなら、transMat互換の計算をします。
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">setContinueMode</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_is_continue</span>:<span class="ActionScriptDefault_Text">Boolean</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptReserved">void</span>
+        <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_is_continue</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">i_is_continue</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+        
+        <span class="ActionScriptASDoc">/**
+         * 白領域の検査対象サイズ
+         *  最大サイズは 一辺約320px、最小サイズは 一辺約 8px まで解析対象としている
+         *  解析画像中で上記範囲内であれば解析対象となるが、最小サイズは小さすぎて意味をなさない。
+         *  マーカー内部の判別には一辺30px～230pxとするのが妥当。
+         *  640x480で取り込む場合は、i_maxを縦サイズの二乗を設定する。
+         *  なお、0 を指定した場合は FLARLabeling.AR_AREA_MAX、FLARLabeling.AR_AREA_MINが適応されます。
+         *  
+         * @param i_max 解析対象とする白領域の最大pixel数(一辺の二乗) default: 100000
+         * @param i_min 解析対象とする白領域の最小pixel数(一辺の二乗) default: 70
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">setAreaRange</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_max</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptOperator">=</span>100000<span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">i_min</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptOperator">=</span>70<span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptReserved">void</span>
+        <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span> <span class="ActionScriptDefault_Text">i_max</span><span class="ActionScriptOperator">&lt;</span>0 <span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptBracket/Brace">{</span> <span class="ActionScriptDefault_Text">i_max</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">FLARLabeling</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">AR_AREA_MAX</span>; <span class="ActionScriptBracket/Brace">}</span>
+            <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span> <span class="ActionScriptDefault_Text">i_min</span><span class="ActionScriptOperator">&lt;</span>0 <span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptBracket/Brace">{</span> <span class="ActionScriptDefault_Text">i_min</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">FLARLabeling</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">AR_AREA_MIN</span>; <span class="ActionScriptBracket/Brace">}</span>
+            <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_max</span> <span class="ActionScriptOperator">&lt;</span> <span class="ActionScriptDefault_Text">i_min</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptBracket/Brace">{</span>
+                <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">tmp</span>:<span class="ActionScriptDefault_Text">int</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">i_max</span>;
+                <span class="ActionScriptDefault_Text">i_max</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">i_min</span>;
+                <span class="ActionScriptDefault_Text">i_min</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">tmp</span>;
+            <span class="ActionScriptBracket/Brace">}</span>
+            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_square_detect</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">setAreaRange</span><span class="ActionScriptBracket/Brace">(</span> <span class="ActionScriptDefault_Text">i_max</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">i_min</span><span class="ActionScriptBracket/Brace">)</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+        
+        <span class="ActionScriptASDoc">/**
+         * 2値化した画像を返却します。
+         * 
+         * @return 画像情報を返却します
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptReserved">get</span> <span class="ActionScriptDefault_Text">thresholdedBitmapData</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptDefault_Text">BitmapData</span>
+        <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptReserved">try</span> <span class="ActionScriptBracket/Brace">{</span>
+                <span class="ActionScriptReserved">return</span> <span class="ActionScriptDefault_Text">BitmapData</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">FLARBinRaster</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_bin_raster</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">getBuffer</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptBracket/Brace">}</span> <span class="ActionScriptReserved">catch</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">e</span>:<span class="ActionScriptDefault_Text">Error</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptBracket/Brace">{</span>
+                <span class="ActionScriptReserved">return</span> <span class="ActionScriptReserved">null</span>;
+            <span class="ActionScriptBracket/Brace">}</span>
+            <span class="ActionScriptReserved">return</span> <span class="ActionScriptReserved">null</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+    <span class="ActionScriptBracket/Brace">}</span>
+<span class="ActionScriptBracket/Brace">}</span>
+
+</pre></body>
+</html>

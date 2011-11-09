@@ -1,0 +1,44 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>FLARManagerExampleLauncher.as</title>
+<link rel="stylesheet" type="text/css" href="../SourceStyles.css"/>
+</head>
+
+<body><pre><span class="ActionScriptpackage">package</span> <span class="ActionScriptBracket/Brace">{</span>
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">examples</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">display</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">Sprite</span>;
+
+    <span class="ActionScriptBracket/Brace">[</span><span class="ActionScriptMetadata">SWF</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptString">"640"</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">height</span><span class="ActionScriptOperator">=</span><span class="ActionScriptString">"480"</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">frameRate</span><span class="ActionScriptOperator">=</span><span class="ActionScriptString">"60"</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">backgroundColor</span><span class="ActionScriptOperator">=</span><span class="ActionScriptString">"#FFFFFF"</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">]</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptclass">class</span> <span class="ActionScriptDefault_Text">FLARManagerExampleLauncher</span> <span class="ActionScriptReserved">extends</span> <span class="ActionScriptDefault_Text">Sprite</span> <span class="ActionScriptBracket/Brace">{</span>
+        
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">FLARManagerExampleLauncher</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptComment">// simply uncomment whichever tutorial/example you would like to launch.
+</span>            
+            <span class="ActionScriptComment">// simple tutorials for 2D, 3D, and 3D external models
+</span>        <span class="ActionScriptComment">//    this.addChild(new FLARManagerTutorial_2D());
+</span><span class="ActionScriptComment">//            this.addChild(new FLARManagerTutorial_3D());
+</span>    <span class="ActionScriptComment">//        this.addChild(new FLARManagerTutorial_Collada_Away3D());
+</span>            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">addChild</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">FLARManagerTutorial_Collada_PV3D</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span>;
+            
+            <span class="ActionScriptComment">// 2D and 3D examples using only FLARManager and native AS3
+</span><span class="ActionScriptComment">//            this.addChild(new FLARManagerExample_2D());
+</span><span class="ActionScriptComment">//            this.addChild(new FLARManagerExample_Flash3D());
+</span>
+            <span class="ActionScriptComment">// 3D examples using third-party 3D frameworks
+</span><span class="ActionScriptComment">//            this.addChild(new FLARManagerExample_Alternativa3D());
+</span><span class="ActionScriptComment">//            this.addChild(new FLARManagerExample_Away3D());
+</span><span class="ActionScriptComment">//            this.addChild(new FLARManagerExample_Away3DLite());
+</span><span class="ActionScriptComment">//            this.addChild(new FLARManagerExample_PV3D());
+</span><span class="ActionScriptComment">//            this.addChild(new FLARManagerExample_Sandy3D());
+</span>            
+            <span class="ActionScriptComment">// miscellaneous examples
+</span><span class="ActionScriptComment">//            this.addChild(new FLARManagerExample_2D_Loader());
+</span><span class="ActionScriptComment">//            this.addChild(new FLARManagerExample_Widescreen());
+</span>        <span class="ActionScriptBracket/Brace">}</span>
+    <span class="ActionScriptBracket/Brace">}</span>
+<span class="ActionScriptBracket/Brace">}</span></pre></body>
+</html>
