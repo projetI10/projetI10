@@ -1,0 +1,63 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>IFLARMatrixSmoother.as</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../SourceStyles.css"/>
+</head>
+
+<body><pre><span class="ActionScriptComment">/* 
+ * PROJECT: FLARManager
+ * http://transmote.com/flar
+ * Copyright 2009, Eric Socolofsky
+ * --------------------------------------------------------------------------------
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this framework; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * 
+ * For further information please contact:
+ *    &lt;eric(at)transmote.com&gt;
+ *    http://transmote.com/flar
+ * 
+ */</span>
+<span class="ActionScriptpackage">package</span> <span class="ActionScriptDefault_Text">com</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">transmote</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flar</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">utils</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">smoother</span> <span class="ActionScriptBracket/Brace">{</span>
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">__AS3__</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">vec</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">Vector</span>;
+    
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">geom</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">Matrix3D</span>;
+    
+    <span class="ActionScriptASDoc">/**
+     * Interface that defines how classes used to smooth transformation matrices will interface with FLARManager. 
+     * 
+     * @author    Eric Socolofsky
+     * @url        http://transmote.com/flar
+     */</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptinterface">interface</span> <span class="ActionScriptDefault_Text">IFLARMatrixSmoother</span> <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptASDoc">/**
+         * Init from a name-value paired object that contains parameters parsed from XML.
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">initFromXML</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">paramsObj</span>:<span class="ActionScriptDefault_Text">Object</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptReserved">void</span>;
+        
+        <span class="ActionScriptASDoc">/**
+         * Returns a Matrix3D that is the average of the last @numFrames Matrix3D instances.
+         * @param    matrixHistory    Vector of previous matrices to average.
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">smoothMatrices</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">storedMatrices</span>:<span class="ActionScriptDefault_Text">Vector</span><span class="ActionScriptBracket/Brace">.&lt;</span><span class="ActionScriptDefault_Text">Matrix3D</span><span class="ActionScriptBracket/Brace">&gt;</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptDefault_Text">Matrix3D</span>;
+        
+        <span class="ActionScriptASDoc">/**
+         * Halts all processes and frees this instance for garbage collection.
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">dispose</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptReserved">void</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+<span class="ActionScriptBracket/Brace">}</span></pre></body>
+</html>

@@ -1,0 +1,148 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>IFLARTrackerManager.as</title>
+<link rel="stylesheet" type="text/css" href="../../../../../SourceStyles.css"/>
+</head>
+
+<body><pre><span class="ActionScriptComment">/* 
+* PROJECT: FLARManager
+* http://transmote.com/flar
+* Copyright 2009, Eric Socolofsky
+* --------------------------------------------------------------------------------
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+* 
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with this framework; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+* 
+* For further information please contact:
+*    &lt;eric(at)transmote.com&gt;
+*    http://transmote.com/flar
+*/</span>
+<span class="ActionScriptpackage">package</span> <span class="ActionScriptDefault_Text">com</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">transmote</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flar</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">tracker</span> <span class="ActionScriptBracket/Brace">{</span>
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">com</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">transmote</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flar</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">marker</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">FLARMarker</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">com</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">transmote</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flar</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">source</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">IFLARSource</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">com</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">transmote</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flar</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">utils</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">FLARManagerConfigLoader</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">com</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">transmote</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flar</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">utils</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">threshold</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">IThresholdAdapter</span>;
+    
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">display</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">Bitmap</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">display</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">Stage</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">events</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">IEventDispatcher</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">geom</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">Matrix3D</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">geom</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">Rectangle</span>;
+    
+    <span class="ActionScriptASDoc">/**
+     * Interface that defines how different tracking libraries plug into FLARManager.
+     * All tracker managers must implement this interface.
+     *  
+     * @author    Eric Socolofsky
+     * @url        http://transmote.com/flar
+     */</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptinterface">interface</span> <span class="ActionScriptDefault_Text">IFLARTrackerManager</span> <span class="ActionScriptReserved">extends</span> <span class="ActionScriptDefault_Text">IEventDispatcher</span> <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptASDoc">/**
+         * The string id of this tracker manager.
+         * All tracker manager ids are enumerated in FLARManager.as.
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptReserved">get</span> <span class="ActionScriptDefault_Text">id</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptDefault_Text">String</span>;
+        
+        <span class="ActionScriptASDoc">/**
+         * Reference to IFLARSource instance from which the tracker gets
+         * the BitmapData object to analyze for object tracking.
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptReserved">get</span> <span class="ActionScriptDefault_Text">trackerSource</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptDefault_Text">IFLARSource</span>;
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptReserved">set</span> <span class="ActionScriptDefault_Text">trackerSource</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">flarSource</span>:<span class="ActionScriptDefault_Text">IFLARSource</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptReserved">void</span>;
+        
+        <span class="ActionScriptASDoc">/**
+         * IFLARThresholdAdapter instance used to automate threshold changes.
+         * 
+         * @see com.transmote.flar.FLARManager#thresholdAdapter
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptReserved">get</span> <span class="ActionScriptDefault_Text">thresholdAdapter</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptDefault_Text">IThresholdAdapter</span>;
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptReserved">set</span> <span class="ActionScriptDefault_Text">thresholdAdapter</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">thresholdAdapter</span>:<span class="ActionScriptDefault_Text">IThresholdAdapter</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptReserved">void</span>;
+        
+        <span class="ActionScriptASDoc">/**
+         * Threshold applied to BitmapData before tracker analysis.
+         * 
+         * @see com.transmote.flar.FLARManager#threshold
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptReserved">get</span> <span class="ActionScriptDefault_Text">threshold</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptDefault_Text">Number</span>;
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptReserved">set</span> <span class="ActionScriptDefault_Text">threshold</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">threshold</span>:<span class="ActionScriptDefault_Text">Number</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptReserved">void</span>;
+        
+        <span class="ActionScriptASDoc">/**
+         * Set to &lt;code&gt;true&lt;/code&gt; to display the source BitmapData used by the tracker post-thresholding.
+         * 
+         * @see com.transmote.flar.FLARManager#thresholdSourceDisplay
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptReserved">get</span> <span class="ActionScriptDefault_Text">thresholdSourceDisplay</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptDefault_Text">Boolean</span>;
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptReserved">set</span> <span class="ActionScriptDefault_Text">thresholdSourceDisplay</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">val</span>:<span class="ActionScriptDefault_Text">Boolean</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptReserved">void</span>;
+        
+        <span class="ActionScriptASDoc">/**
+         * Retrieve a Bitmap to display the source BitmapData analyzed by the tracker post-thresholding.
+         * Displaying the thresholded source can be useful for debugging threshold changes.
+         */</span> 
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptReserved">get</span> <span class="ActionScriptDefault_Text">thresholdSourceBitmap</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptDefault_Text">Bitmap</span>;
+        
+        <span class="ActionScriptASDoc">/**
+         * Retrieve the projection matrix used by the tracker
+         * to map 3D transform matrices to the perspective view of the application.
+         * Use the returned Matrix3D instance with the application's 3D framework camera,
+         * or apply directly to a container object.
+         * 
+         * @param    frameworkId        The id of the 3D framework used by the application,
+         *                             as enumerated in FLARManager.
+         * @param    viewportSize    The size, as a Rectangle instance, of the container
+         *                             holding all 3D objects to be transformed by the tracker results.
+         */</span> 
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">getProjectionMatrix</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">frameworkId</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">viewportSize</span>:<span class="ActionScriptDefault_Text">Rectangle</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptDefault_Text">Matrix3D</span>;
+        
+        <span class="ActionScriptASDoc">/**
+         * Load configuration data for the tracker, including camera parameters.
+         * This method is called automatically by FLARManager;
+         * application developers should not call this method.
+         * 
+         * @param    configLoader    The FLARManagerConfigLoader instance with loaded configuration data.
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">loadTrackerConfig</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">configLoader</span>:<span class="ActionScriptDefault_Text">FLARManagerConfigLoader</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptReserved">void</span>;
+        
+        <span class="ActionScriptASDoc">/**
+         * Initialize the tracker.
+         * This method is called automatically by FLARManager;
+         * application developers should not call this method.
+         * 
+         * @param    stage    A reference to the application's Stage.
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">initTracker</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">stage</span>:<span class="ActionScriptDefault_Text">Stage</span><span class="ActionScriptOperator">=</span><span class="ActionScriptReserved">null</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptReserved">void</span>;
+        
+        <span class="ActionScriptASDoc">/**
+         * Perform any adjustments, such as thresholding,
+         * to the source BitmapData before tracker analysis.
+         * This method is called automatically by FLARManager;
+         * application developers should not call this method.
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">performSourceAdjustments</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptReserved">void</span>;
+        
+        <span class="ActionScriptASDoc">/**
+         * Instruct the tracker to detect objects (e.g. markers, patterns, images).
+         * This method is called automatically by FLARManager;
+         * application developers should not call this method.
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">detectMarkers</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptDefault_Text">Vector</span><span class="ActionScriptBracket/Brace">.&lt;</span><span class="ActionScriptDefault_Text">FLARMarker</span><span class="ActionScriptBracket/Brace">&gt;</span>;
+        
+        <span class="ActionScriptASDoc">/**
+         * Halts all processes and frees the tracker for garbage collection.
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">dispose</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptReserved">void</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+<span class="ActionScriptBracket/Brace">}</span></pre></body>
+</html>

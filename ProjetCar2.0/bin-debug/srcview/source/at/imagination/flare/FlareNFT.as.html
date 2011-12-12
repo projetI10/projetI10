@@ -1,0 +1,648 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>FlareNFT.as</title>
+<link rel="stylesheet" type="text/css" href="../../../../SourceStyles.css"/>
+</head>
+
+<body><pre><span class="ActionScriptASDoc">/****************************************************************************\
+ *
+ *  (C) 2010 by Imagination Computer Services GesmbH. All rights reserved.
+ *
+ *  Project: flare
+ *
+ *  @author Stefan Hynst
+ *
+\****************************************************************************/</span>
+
+
+<span class="ActionScriptpackage">package</span> <span class="ActionScriptDefault_Text">at</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">imagination</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flare</span>
+<span class="ActionScriptBracket/Brace">{</span>
+<span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">cmodule</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">libFlareNFT</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">CLibInit</span>;
+
+<span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">display</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">BitmapData</span>;
+<span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">display</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">Stage</span>;
+<span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">utils</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">ByteArray</span>;
+
+<span class="ActionScriptComment">// ----------------------------------------------------------------------------
+</span>
+<span class="ActionScriptASDoc">/**
+ * FlareNFT is a wrapper class providing convenient methods to use the
+ * functions provided by &lt;b&gt;libFlareNFT&lt;/b&gt;.&lt;br/&gt; For an example on how to use it see
+ * &lt;code&gt;samples/TestNFT&lt;/code&gt;.
+ */</span>
+<span class="ActionScriptReserved">public</span> <span class="ActionScriptclass">class</span> <span class="ActionScriptDefault_Text">FlareNFT</span> <span class="ActionScriptReserved">implements</span> <span class="ActionScriptDefault_Text">IFlareTracker</span>
+<span class="ActionScriptBracket/Brace">{</span>
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">m_CLib</span>:<span class="ActionScriptDefault_Text">CLibInit</span>;
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">m_logFunc</span>:<span class="ActionScriptDefault_Text">Function</span>;
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">m_fileLoader</span>:<span class="ActionScriptDefault_Text">FilePreloader</span>;
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">m_trackerLib</span>:<span class="ActionScriptDefault_Text">Object</span>;
+
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span>    <span class="ActionScriptDefault_Text">m_stage</span>:<span class="ActionScriptDefault_Text">Stage</span>;
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span>    <span class="ActionScriptDefault_Text">m_dataPath</span>:<span class="ActionScriptDefault_Text">String</span>;
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span>    <span class="ActionScriptDefault_Text">m_featureSetFile</span>:<span class="ActionScriptDefault_Text">String</span>;
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span>    <span class="ActionScriptDefault_Text">m_camFile</span>:<span class="ActionScriptDefault_Text">String</span>;
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">m_camWidth</span>:<span class="ActionScriptDefault_Text">uint</span>;
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">m_camHeight</span>:<span class="ActionScriptDefault_Text">uint</span>;
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">m_camFPS</span>:<span class="ActionScriptDefault_Text">uint</span>;
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">m_multiTargets</span>:<span class="ActionScriptDefault_Text">Boolean</span>;
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">m_initDoneCB</span>:<span class="ActionScriptDefault_Text">Function</span>;
+
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">m_alcMemory</span>:<span class="ActionScriptDefault_Text">ByteArray</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptReserved">null</span>;
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">m_alcImagePointer</span>:<span class="ActionScriptDefault_Text">uint</span>;
+
+    <span class="ActionScriptComment">// ------------------------------------------------------------------------
+</span>    
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">FlareNFT</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptDefault_Text">m_logFunc</span>    <span class="ActionScriptOperator">=</span> <span class="ActionScriptReserved">null</span>;
+        <span class="ActionScriptDefault_Text">m_CLib</span>       <span class="ActionScriptOperator">=</span> <span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">CLibInit</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+        <span class="ActionScriptDefault_Text">m_trackerLib</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">m_CLib</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">init</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+
+    <span class="ActionScriptComment">// ------------------------------------------------------------------------
+</span>
+    <span class="ActionScriptASDoc">/**
+     *  Returns the version of flareNFT
+     *
+     *  @return Version number as String formatted as &lt;code&gt;major.minor.build&lt;/code&gt;
+     */</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">getVersion</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptDefault_Text">String</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptReserved">return</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">m_trackerLib</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">getVersion</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+
+    <span class="ActionScriptComment">// ------------------------------------------------------------------------
+</span>    
+    <span class="ActionScriptASDoc">/**
+     *  Sets a logging function: Use this to display logging output from libFlareNFT.
+     *  
+     *  @param obj If the logging function is a method of an object, set this to
+     *  the method's object. Otherwise pass &lt;code&gt;null&lt;/code&gt;
+     *
+     *  @param logger The logging function that will be called from libFlareNFT.&lt;br/&gt;
+     *  The function must be of type &lt;code&gt;function(int,&amp;#xA0;String):void&lt;/code&gt;
+     *
+     *  @param level Only produce logging output for log-levels &amp;lt;= &lt;code&gt;level&lt;/code&gt;
+     */</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">setLogger</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">obj</span>:<span class="ActionScriptDefault_Text">Object</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">logger</span>:<span class="ActionScriptDefault_Text">Function</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">level</span>:<span class="ActionScriptDefault_Text">uint</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptReserved">void</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptDefault_Text">m_logFunc</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">logger</span>;
+        <span class="ActionScriptDefault_Text">m_trackerLib</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">setLogger</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">obj</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">logger</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">level</span><span class="ActionScriptBracket/Brace">)</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+
+    <span class="ActionScriptComment">// ------------------------------------------------------------------------
+</span>
+    <span class="ActionScriptASDoc">/**
+     *  Initializes the tracker. This needs to be called before &lt;code&gt;update()&lt;/code&gt;
+     *  
+     *  @param dataPath Path were all the datafiles (camera ini-file, feature-set file,
+     *  database files and pgm-files) are located.
+     *
+     *  @param stage The application's stage.
+     *
+     *  @param camFile Name of the camera initalization file.
+     *
+     *  @param camWidth Width of the camera input in pixels.
+     *
+     *  @param camHeight Height of the camera input in pixels.
+     *
+     *  @param camFPS Frames per second.
+     *
+     *  @param featureSetFile Name of the feature set file.
+     *
+     *  @param multiTargets Set this to &lt;code&gt;true&lt;/code&gt; if multiple targets should
+     *  be tracked. This is only necessary, if we want to display more than one
+     *  targets at the same time.
+     *
+     *  @param initDoneCB Callback function to be invoked, when initialization has
+     *  finished. This is necessary, because all input files will be loaded
+     *  asynchronously before libFlareNFT can initialize the tracker.&lt;br/&gt;
+     *  The function must be of type &lt;code&gt;function():void&lt;/code&gt;
+     */</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">init</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">stage</span>:<span class="ActionScriptDefault_Text">Stage</span><span class="ActionScriptOperator">,</span>
+                         <span class="ActionScriptDefault_Text">dataPath</span>:<span class="ActionScriptDefault_Text">String</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">camFile</span>:<span class="ActionScriptDefault_Text">String</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">camWidth</span>:<span class="ActionScriptDefault_Text">uint</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">camHeight</span>:<span class="ActionScriptDefault_Text">uint</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">camFPS</span>:<span class="ActionScriptDefault_Text">uint</span><span class="ActionScriptOperator">,</span>
+                         <span class="ActionScriptDefault_Text">featureSetFile</span>:<span class="ActionScriptDefault_Text">String</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">multiTargets</span>:<span class="ActionScriptDefault_Text">Boolean</span><span class="ActionScriptOperator">,</span>
+                         <span class="ActionScriptDefault_Text">initDoneCB</span>:<span class="ActionScriptDefault_Text">Function</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptReserved">void</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptDefault_Text">m_stage</span>          <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">stage</span>;
+        <span class="ActionScriptDefault_Text">m_dataPath</span>       <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">dataPath</span>;
+        <span class="ActionScriptDefault_Text">m_featureSetFile</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">featureSetFile</span>;
+        <span class="ActionScriptDefault_Text">m_camFile</span>        <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">camFile</span>;
+        <span class="ActionScriptDefault_Text">m_camWidth</span>       <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">camWidth</span>;
+        <span class="ActionScriptDefault_Text">m_camHeight</span>      <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">camHeight</span>;
+        <span class="ActionScriptDefault_Text">m_camFPS</span>         <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">camFPS</span>;
+        <span class="ActionScriptDefault_Text">m_multiTargets</span>   <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">multiTargets</span>;
+        <span class="ActionScriptDefault_Text">m_initDoneCB</span>     <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">initDoneCB</span>;
+
+        <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">m_stage</span> <span class="ActionScriptOperator">!=</span> <span class="ActionScriptReserved">null</span><span class="ActionScriptBracket/Brace">)</span>
+        <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptComment">// get absolute path and replace backslashes with slashes
+</span>            <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">basePath</span>:<span class="ActionScriptDefault_Text">String</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">m_stage</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">loaderInfo</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">loaderURL</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">replace</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptString">/[\\]/g</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptString">"/"</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptComment">// cut off query part
+</span>            <span class="ActionScriptDefault_Text">basePath</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">basePath</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">slice</span><span class="ActionScriptBracket/Brace">(</span>0<span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">basePath</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">indexOf</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptString">"?"</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptComment">// cut off file name, keep last slash
+</span>            <span class="ActionScriptDefault_Text">basePath</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">basePath</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">slice</span><span class="ActionScriptBracket/Brace">(</span>0<span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">basePath</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">lastIndexOf</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptString">"/"</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptOperator">+</span> 1<span class="ActionScriptBracket/Brace">)</span>;
+
+            <span class="ActionScriptComment">// create preloader:
+</span>            <span class="ActionScriptComment">//   all files needed by libFlareNFT have to be preloaded and passed
+</span>            <span class="ActionScriptComment">//   to alchemy via m_Clib.supplyFile()
+</span>            <span class="ActionScriptComment">//
+</span>            <span class="ActionScriptDefault_Text">m_fileLoader</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">FilePreloader</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">fileLoadedCB</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptDefault_Text">m_fileLoader</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">loadStart</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptDefault_Text">m_fileLoader</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">load</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptString">"flareNFT.lic"</span>  <span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">basePath</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptDefault_Text">m_fileLoader</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">load</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">m_camFile</span>       <span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">m_dataPath</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptDefault_Text">m_fileLoader</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">load</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">m_featureSetFile</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">m_dataPath</span><span class="ActionScriptBracket/Brace">)</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+    <span class="ActionScriptBracket/Brace">}</span>
+
+    <span class="ActionScriptComment">// ------------------------------------------------------------------------
+</span>
+    <span class="ActionScriptASDoc">/**
+     *  Returns the projection matrix. Since the camera doesn't move during tracking,
+     *  this needs to be called only once after &lt;code&gt;init()&lt;/code&gt; to obtain the
+     *  projection matrix. 
+     *
+     *  @return The matrix is retured as a &lt;code&gt;ByteArray&lt;/code&gt; containing 4x4 Numbers.
+     *
+     *  @example To set the projection matrix for a camera in
+     *  &lt;a href="http://blog.papervision3d.org/"&gt;papervison3D&lt;/a&gt;,
+     *  you would do the following:
+     *
+     *  &lt;pre&gt;
+     *    var mat:ByteArray = flareTrackerNFT.getProjectionMatrix();
+     *    var proj:Matrix3D = (_camera as Camera3D).projection;
+     *  &amp;#xA0;
+     *    proj.n11 =  mat.readFloat();
+     *    proj.n21 = -mat.readFloat();
+     *    proj.n31 =  mat.readFloat();
+     *    proj.n41 =  mat.readFloat();
+     *  &amp;#xA0;
+     *    proj.n12 =  mat.readFloat();
+     *    proj.n22 = -mat.readFloat();
+     *    proj.n32 =  mat.readFloat();
+     *    proj.n42 =  mat.readFloat();
+     *  &amp;#xA0;
+     *    proj.n13 =  mat.readFloat();
+     *    proj.n23 = -mat.readFloat();
+     *    proj.n33 =  mat.readFloat();
+     *    proj.n43 =  mat.readFloat();
+     *  &amp;#xA0;
+     *    proj.n14 =  mat.readFloat();
+     *    proj.n24 = -mat.readFloat();
+     *    proj.n34 =  mat.readFloat();
+     *    proj.n44 =  mat.readFloat();
+     *  &lt;/pre&gt;
+     *
+     *  Note that the 2nd row is inverted, because we need to convert from a
+     *  right-handed coordinate system (used by flare) to a left-handed
+     *  coordinate system (used by
+     *  &lt;a href="http://blog.papervision3d.org/"&gt;papervison3D&lt;/a&gt;).
+     */</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">getProjectionMatrix</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptDefault_Text">ByteArray</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptOperator">!</span> <span class="ActionScriptDefault_Text">m_alcMemory</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptReserved">return</span> <span class="ActionScriptReserved">null</span>;
+
+        <span class="ActionScriptDefault_Text">m_alcMemory</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">position</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">m_trackerLib</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">getProjectionMatrixPtr</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+        <span class="ActionScriptReserved">return</span> <span class="ActionScriptDefault_Text">m_alcMemory</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+
+    <span class="ActionScriptComment">// ------------------------------------------------------------------------
+</span>
+    <span class="ActionScriptASDoc">/**
+     *  This method needs to be called every frame to obtain the tracking results.
+     *  
+     *  @param image The bitmap grabbed from the camera.
+     *
+     *  @return Number of targets found.
+     */</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">update</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">image</span>:<span class="ActionScriptDefault_Text">BitmapData</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptDefault_Text">uint</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptOperator">!</span> <span class="ActionScriptDefault_Text">m_alcMemory</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptReserved">return</span> <span class="ActionScriptReserved">null</span>;
+
+        <span class="ActionScriptComment">// write to "alchemy memory"    
+</span>        <span class="ActionScriptDefault_Text">m_alcMemory</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">position</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">m_alcImagePointer</span>;
+        <span class="ActionScriptDefault_Text">m_alcMemory</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">writeBytes</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">image</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">getPixels</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">image</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">rect</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span>;    
+
+        <span class="ActionScriptComment">// returns number of targets found
+</span>        <span class="ActionScriptReserved">return</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">m_trackerLib</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">update</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+
+    <span class="ActionScriptComment">// ------------------------------------------------------------------------
+</span>
+    <span class="ActionScriptASDoc">/**
+     *  Returns the tracking results. Call this method after &lt;code&gt;update()&lt;/code&gt;
+     *  found one or more targets.
+     *  
+     *  @return The tracking results are returned as a &lt;code&gt;ByteArray&lt;/code&gt; structure
+     *  of the following form:
+     *  &lt;pre&gt;
+     *    reserved:int;            // reserved for later use
+     *    targetID:int;            // unique identifier of the target
+     *  &amp;#xA0;
+     *    poseMatrix_11:Number;    // pose matrix: model view matrix of target in 3D space
+     *    poseMatrix_21:Number;
+     *    poseMatrix_31:Number;
+     *    poseMatrix_41:Number;
+     *  &amp;#xA0;
+     *    poseMatrix_12:Number;
+     *    poseMatrix_22:Number;
+     *    poseMatrix_32:Number;
+     *    poseMatrix_42:Number;
+     *  &amp;#xA0;
+     *    poseMatrix_13:Number;
+     *    poseMatrix_23:Number;
+     *    poseMatrix_33:Number;
+     *    poseMatrix_43:Number;
+     *  &amp;#xA0;
+     *    poseMatrix_14:Number;
+     *    poseMatrix_24:Number;
+     *    poseMatrix_34:Number;
+     *    poseMatrix_44:Number;
+     *  &lt;/pre&gt;
+     *  This structure is repeated in the &lt;code&gt;ByteArray&lt;/code&gt; for every target found.
+     *
+     *  @example This example shows how the tracker results can be parsed.
+     *  &lt;pre&gt;
+     *    var targetID:int;
+     *    var mat:Matrix3D = new Matrix3D();
+     *    var numTargets:uint = flareTrackerNFT.update(bitmap);
+     *    var targetData:ByteArray = flareTrackerNFT.getTrackerResults();
+     *  &amp;#xA0;
+     *    // iterate over all visible targets
+     *    for (var i:uint = 0; i &amp;lt; numTargets; i++)
+     *    {
+     *      targetData.readInt();        // unused
+     *      targetID = targetData.readInt();
+     *  &amp;#xA0;
+     *      // read pose matrix (= model view matrix)
+     *      mat.n11 =  targetData.readFloat();
+     *      mat.n21 = -targetData.readFloat();
+     *      mat.n31 =  targetData.readFloat();
+     *      mat.n41 =  targetData.readFloat();
+     *  &amp;#xA0;
+     *      mat.n12 =  targetData.readFloat();
+     *      mat.n22 = -targetData.readFloat();
+     *      mat.n32 =  targetData.readFloat();
+     *      mat.n42 =  targetData.readFloat();
+     *  &amp;#xA0;
+     *      mat.n13 =  targetData.readFloat();
+     *      mat.n23 = -targetData.readFloat();
+     *      mat.n33 =  targetData.readFloat();
+     *      mat.n43 =  targetData.readFloat();
+     *  &amp;#xA0;
+     *      mat.n14 =  targetData.readFloat();
+     *      mat.n24 = -targetData.readFloat();
+     *      mat.n34 =  targetData.readFloat();
+     *      mat.n44 =  targetData.readFloat();
+     *  &amp;#xA0;
+     *      // show target object and apply transformation
+     *      showObject(targetID, mat);
+     *    }
+     *  &lt;/pre&gt;
+     *
+     *  The 2nd row of the pose matrix is inverted to convert from a right-handed
+     *  coordinate system to a left-handed coordinate system.
+     */</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">getTrackerResults</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptDefault_Text">ByteArray</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptOperator">!</span> <span class="ActionScriptDefault_Text">m_alcMemory</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptReserved">return</span> <span class="ActionScriptReserved">null</span>;
+        <span class="ActionScriptDefault_Text">m_alcMemory</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">position</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">m_trackerLib</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">getTrackerResultPtr</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+        <span class="ActionScriptReserved">return</span> <span class="ActionScriptDefault_Text">m_alcMemory</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+
+    <span class="ActionScriptComment">// ------------------------------------------------------------------------
+</span>
+    <span class="ActionScriptASDoc">/**
+     *  Returns the 2d-tracking results. Call this method after &lt;code&gt;update()&lt;/code&gt;
+     *  found one or more targets.
+     *  
+     *  @return The 2d-tracking results are returned as a &lt;code&gt;ByteArray&lt;/code&gt; structure
+     *  of the following form:
+     *  &lt;pre&gt;
+     *    reserved:int;        // reserved for later use
+     *    targetID:int;        // unique identifier of the target
+     *  &amp;#xA0;
+     *  &amp;#xA0;                 // corner points of the target in image space
+     *    cornerUL_x:Number;   // upper left corner point
+     *    cornerUL_y:Number;
+     *  &amp;#xA0;
+     *    cornerUR_x:Number;   // upper right corner point
+     *    cornerUR_y:Number;
+     *  &amp;#xA0;
+     *    cornerLR_x:Number;   // lower right corner point
+     *    cornerLR_y:Number;
+     *  &amp;#xA0;
+     *    cornerLL_x:Number;   // lower left corner point
+     *    cornerLL_y:Number;
+     *  &lt;/pre&gt;
+     *  This structure is repeated in the &lt;code&gt;ByteArray&lt;/code&gt; for every target found.
+     *
+     */</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">getTrackerResults2D</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptDefault_Text">ByteArray</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptOperator">!</span> <span class="ActionScriptDefault_Text">m_alcMemory</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptReserved">return</span> <span class="ActionScriptReserved">null</span>;
+        <span class="ActionScriptDefault_Text">m_alcMemory</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">position</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">m_trackerLib</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">getTrackerResult2DPtr</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+        <span class="ActionScriptReserved">return</span> <span class="ActionScriptDefault_Text">m_alcMemory</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+
+    <span class="ActionScriptComment">// ------------------------------------------------------------------------
+</span>
+    <span class="ActionScriptASDoc">/**
+     *  Sets a button handler that will be invoked if a virtual button that was
+     *  defined with the function &lt;code&gt;addButton()&lt;/code&gt; was pressed or released.
+     *  
+     *  @param obj If the button handler is a method of an object, set this to the
+     *  method's object. Otherwise pass &lt;code&gt;null&lt;/code&gt;
+     *
+     *  @param handler The callback function that will be invoked whenever a virtual
+     *  button was pressed or released. The function must be of type
+     *  &lt;code&gt;function(uint,&amp;#xA0;uint,&amp;#xA0;Boolean):void&lt;/code&gt;.
+     *  &lt;p/&gt;
+     *  As first argument to the callback function the id of the button's target
+     *  will be passed. The second argument is the button's id. The third argument
+     *  is either &lt;code&gt;true&lt;/code&gt; (button was pressed) or
+     *  &lt;code&gt;false&lt;/code&gt; (button was released).
+     */</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">setButtonHandler</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">obj</span>:<span class="ActionScriptDefault_Text">Object</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">handler</span>:<span class="ActionScriptDefault_Text">Function</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptReserved">void</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptDefault_Text">m_trackerLib</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">setButtonHandler</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">obj</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">handler</span><span class="ActionScriptBracket/Brace">)</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+
+    <span class="ActionScriptComment">// ------------------------------------------------------------------------
+</span>
+    <span class="ActionScriptASDoc">/**
+     *  Adds a virtual button to a target. A virtual button is a rectangular area
+     *  on the target that will be checked at runtime for occlusion.
+     *  &lt;p/&gt;
+     *  If this area is covered (e.g. by moving your finger over the button),
+     *  a button press event is generated and the button handler function that
+     *  was defined with &lt;code&gt;setButtonHandler()&lt;/code&gt; is called.
+     *  A release event is triggered when the button is uncovered again.
+     *  
+     *  @param targetID The id of the target to add a button for. To find out the id
+     *  of a target image, look at the assignments in the feature-set file.
+     *  
+     *  @param x0 The x-coordinate of the upper-left corner of the button
+     *
+     *  @param y0 The y-coordinate of the upper-left corner of the button
+     *
+     *  @param x1 The x-coordinate of the lower-right corner of the button
+     *
+     *  @param y1 The y-coordinate of the lower-right corner of the button
+     *
+     *  @param minCoverage The percentage of the area that needs to be covered
+     *  to set the button's state to "blocked". This is a float value greater than
+     *  0 (0%) and smaller than 1 (100%).&lt;br/&gt;
+     *  If 0 is passed or the value is omitted, a default coverage value of
+     *  0.7 (70%) is assumed.
+     *
+     *  @param minBlockedFrames Number of frames during an observation period of
+     *  &lt;code&gt;historyLength&lt;/code&gt; frames the button has to be in blocked state
+     *  in order to trigger a button press event.&lt;br/&gt;
+     *  If 0 is passed or the value is omitted, a default value of 12 is assumed.
+     *
+     *  @param historyLength Length of the observation period of a button's state.
+     *  The shorter the history, the faster the button will react with a press
+     *  or release event. However, if the history is too short, "false" events
+     *  may occur, resulting in a jitter-like behavior. If the history is to long,
+     *  the events will be very stable, but the button will react with a considerable
+     *  delay. The length of the delay is &lt;code&gt;historyLength/frameRate&lt;/code&gt;
+     *  seconds.&lt;br/&gt;
+     *  If 0 is passed or the value is omitted, a default value of 15 is assumed.
+     *
+     *  @return The id of the new button is returned. If the function fails, -1 is returned.
+     */</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">addButton</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">targetID</span>:<span class="ActionScriptDefault_Text">uint</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">x0</span>:<span class="ActionScriptDefault_Text">Number</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">y0</span>:<span class="ActionScriptDefault_Text">Number</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">x1</span>:<span class="ActionScriptDefault_Text">Number</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">y1</span>:<span class="ActionScriptDefault_Text">Number</span><span class="ActionScriptOperator">,</span>
+                              <span class="ActionScriptDefault_Text">minCoverage</span>:<span class="ActionScriptDefault_Text">Number</span><span class="ActionScriptOperator">=</span>0<span class="ActionScriptOperator">,</span>
+                              <span class="ActionScriptDefault_Text">minBlockedFrames</span>:<span class="ActionScriptDefault_Text">uint</span><span class="ActionScriptOperator">=</span>0<span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">historyLength</span>:<span class="ActionScriptDefault_Text">uint</span><span class="ActionScriptOperator">=</span>0<span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptDefault_Text">int</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptReserved">return</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">m_trackerLib</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">addButton</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">targetID</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">x0</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">y0</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">x1</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">y1</span><span class="ActionScriptOperator">,</span>
+                                       <span class="ActionScriptDefault_Text">minCoverage</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">minBlockedFrames</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">historyLength</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+
+    <span class="ActionScriptComment">// ------------------------------------------------------------------------
+</span>
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">fileLoadedCB</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">url</span>:<span class="ActionScriptDefault_Text">String</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">data</span>:<span class="ActionScriptDefault_Text">ByteArray</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">errMsg</span>:<span class="ActionScriptDefault_Text">String</span><span class="ActionScriptOperator">=</span><span class="ActionScriptReserved">null</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptReserved">void</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">lines</span>:<span class="ActionScriptDefault_Text">Array</span>;
+        <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">i</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">p</span>:<span class="ActionScriptDefault_Text">int</span>;
+        <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">file</span>:<span class="ActionScriptDefault_Text">String</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">line</span>:<span class="ActionScriptDefault_Text">String</span>;
+
+        <span class="ActionScriptReserved">try</span>
+        <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">errMsg</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptReserved">throw</span> <span class="ActionScriptString">"ERROR: File \""</span> <span class="ActionScriptOperator">+</span> <span class="ActionScriptDefault_Text">url</span> <span class="ActionScriptOperator">+</span> <span class="ActionScriptString">"\" load failed: "</span> <span class="ActionScriptOperator">+</span> <span class="ActionScriptDefault_Text">errMsg</span>;
+
+            <span class="ActionScriptDefault_Text">m_CLib</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">supplyFile</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">url</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">data</span><span class="ActionScriptBracket/Brace">)</span>;
+
+            <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">url</span> <span class="ActionScriptOperator">==</span> <span class="ActionScriptDefault_Text">m_featureSetFile</span><span class="ActionScriptBracket/Brace">)</span>        <span class="ActionScriptComment">// parse feature-set file
+</span>            <span class="ActionScriptBracket/Brace">{</span>
+                <span class="ActionScriptDefault_Text">lines</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">data</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">toString</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">split</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptString">"\n"</span><span class="ActionScriptBracket/Brace">)</span>;
+                <span class="ActionScriptReserved">for</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i</span> <span class="ActionScriptOperator">=</span> 0; <span class="ActionScriptDefault_Text">i</span><span class="ActionScriptOperator">&lt;</span><span class="ActionScriptDefault_Text">lines</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">length</span>; <span class="ActionScriptDefault_Text">i</span><span class="ActionScriptOperator">++</span><span class="ActionScriptBracket/Brace">)</span>
+                <span class="ActionScriptBracket/Brace">{</span>
+                    <span class="ActionScriptDefault_Text">line</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">lines</span><span class="ActionScriptBracket/Brace">[</span><span class="ActionScriptDefault_Text">i</span><span class="ActionScriptBracket/Brace">]</span>;
+                    <span class="ActionScriptDefault_Text">p</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">line</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">search</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptString">"="</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptOperator">+</span> 1;
+                    <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">p</span> <span class="ActionScriptOperator">&lt;=</span> 1<span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptReserved">continue</span>;
+                    <span class="ActionScriptDefault_Text">file</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">trimString</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">line</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">substr</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">p</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span>;
+                    
+                    <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">line</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">search</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptString">"database"</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptOperator">==</span> 0<span class="ActionScriptBracket/Brace">)</span>
+                    <span class="ActionScriptBracket/Brace">{</span>
+                        <span class="ActionScriptComment">// load database files
+</span>                        <span class="ActionScriptDefault_Text">m_fileLoader</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">load</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">file</span> <span class="ActionScriptOperator">+</span> <span class="ActionScriptString">".set"</span>   <span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">m_dataPath</span><span class="ActionScriptBracket/Brace">)</span>;
+                        <span class="ActionScriptDefault_Text">m_fileLoader</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">load</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">file</span> <span class="ActionScriptOperator">+</span> <span class="ActionScriptString">"_0.spil"</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">m_dataPath</span><span class="ActionScriptBracket/Brace">)</span>;
+                        <span class="ActionScriptDefault_Text">m_fileLoader</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">load</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">file</span> <span class="ActionScriptOperator">+</span> <span class="ActionScriptString">"_1.spil"</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">m_dataPath</span><span class="ActionScriptBracket/Brace">)</span>;
+                        <span class="ActionScriptDefault_Text">m_fileLoader</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">load</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">file</span> <span class="ActionScriptOperator">+</span> <span class="ActionScriptString">"_2.spil"</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">m_dataPath</span><span class="ActionScriptBracket/Brace">)</span>;
+                    <span class="ActionScriptBracket/Brace">}</span>
+                    <span class="ActionScriptReserved">else</span> <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">line</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">search</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptString">"-name"</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptOperator">&gt;=</span> 0<span class="ActionScriptBracket/Brace">)</span>
+                    <span class="ActionScriptBracket/Brace">{</span>
+                        <span class="ActionScriptComment">// load pgm files
+</span>                        <span class="ActionScriptDefault_Text">m_fileLoader</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">load</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">file</span> <span class="ActionScriptOperator">+</span> <span class="ActionScriptString">".pgm"</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">m_dataPath</span><span class="ActionScriptBracket/Brace">)</span>;
+                    <span class="ActionScriptBracket/Brace">}</span>
+                <span class="ActionScriptBracket/Brace">}</span>
+                <span class="ActionScriptComment">// preloading is finished now
+</span>                <span class="ActionScriptDefault_Text">m_fileLoader</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">loadEnd</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptBracket/Brace">}</span>
+
+            <span class="ActionScriptComment">// load targets, after all ini-files have been loaded
+</span>            <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">m_fileLoader</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">allFilesLoaded</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span>
+            <span class="ActionScriptBracket/Brace">{</span>
+                <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">isOk</span>:<span class="ActionScriptDefault_Text">Boolean</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">m_trackerLib</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">initTracker</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">m_stage</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">m_camWidth</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">m_camHeight</span><span class="ActionScriptOperator">,</span>
+                                                            <span class="ActionScriptDefault_Text">m_multiTargets</span><span class="ActionScriptOperator">,</span>
+                                                            <span class="ActionScriptDefault_Text">m_camFPS</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">m_camFile</span><span class="ActionScriptBracket/Brace">)</span>;
+                <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptOperator">!</span><span class="ActionScriptDefault_Text">isOk</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptReserved">throw</span> <span class="ActionScriptString">"ERROR: initTracker() failed."</span>;
+
+                <span class="ActionScriptComment">// load features
+</span>                <span class="ActionScriptDefault_Text">isOk</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">m_trackerLib</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">loadTargets</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">m_featureSetFile</span><span class="ActionScriptBracket/Brace">)</span>;
+                <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptOperator">!</span><span class="ActionScriptDefault_Text">isOk</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptReserved">throw</span> <span class="ActionScriptString">"ERROR: loadTargets() failed."</span>;
+
+                <span class="ActionScriptComment">// retrieve the "alchemy memory"
+</span>                <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">ns</span> : <span class="ActionScriptDefault_Text">Namespace</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">Namespace</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptString">"cmodule.libFlareNFT"</span><span class="ActionScriptBracket/Brace">)</span>;
+                <span class="ActionScriptDefault_Text">m_alcMemory</span>   <span class="ActionScriptOperator">=</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">ns</span><span class="ActionScriptOperator">::</span><span class="ActionScriptDefault_Text">gstate</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">ds</span>;
+
+                <span class="ActionScriptComment">// get offset to image buffer
+</span>                <span class="ActionScriptDefault_Text">m_alcImagePointer</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">m_trackerLib</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">getImageBufferPtr</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+
+                <span class="ActionScriptDefault_Text">m_initDoneCB</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;        <span class="ActionScriptComment">// callback function to indicate that init() is finished
+</span>            <span class="ActionScriptBracket/Brace">}</span>
+        <span class="ActionScriptBracket/Brace">}</span>
+        <span class="ActionScriptReserved">catch</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">errStr</span>:<span class="ActionScriptOperator">*</span><span class="ActionScriptBracket/Brace">)</span>
+        <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">m_logFunc</span> <span class="ActionScriptOperator">!=</span> <span class="ActionScriptReserved">null</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptDefault_Text">m_logFunc</span><span class="ActionScriptBracket/Brace">(</span>0<span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">String</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">errStr</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+    <span class="ActionScriptBracket/Brace">}</span>
+
+    <span class="ActionScriptComment">// ------------------------------------------------------------------------
+</span>
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">trimString</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">str</span>:<span class="ActionScriptDefault_Text">String</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptDefault_Text">String</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">isWS</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">character</span>:<span class="ActionScriptDefault_Text">String</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptDefault_Text">Boolean</span>
+        <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptReserved">switch</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">character</span><span class="ActionScriptBracket/Brace">)</span>
+            <span class="ActionScriptBracket/Brace">{</span>
+                <span class="ActionScriptReserved">case</span> <span class="ActionScriptString">" "</span>:
+                <span class="ActionScriptReserved">case</span> <span class="ActionScriptString">"\t"</span>:
+                <span class="ActionScriptReserved">case</span> <span class="ActionScriptString">"\r"</span>:
+                <span class="ActionScriptReserved">case</span> <span class="ActionScriptString">"\n"</span>:
+                <span class="ActionScriptReserved">case</span> <span class="ActionScriptString">"\f"</span>:
+                    <span class="ActionScriptReserved">return</span> <span class="ActionScriptReserved">true</span>;
+    
+                <span class="ActionScriptReserved">default</span>:
+                    <span class="ActionScriptReserved">return</span> <span class="ActionScriptReserved">false</span>;
+            <span class="ActionScriptBracket/Brace">}</span>
+        <span class="ActionScriptBracket/Brace">}</span>        
+
+        <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">startIndex</span>:<span class="ActionScriptDefault_Text">int</span> <span class="ActionScriptOperator">=</span> 0;
+
+        <span class="ActionScriptReserved">while</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">isWS</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">str</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">charAt</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">startIndex</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptDefault_Text">startIndex</span><span class="ActionScriptOperator">++</span>;
+
+        <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">endIndex</span>:<span class="ActionScriptDefault_Text">int</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">str</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">length</span> <span class="ActionScriptOperator">-</span> 1;
+        <span class="ActionScriptReserved">while</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">isWS</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">str</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">charAt</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">endIndex</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptDefault_Text">endIndex</span><span class="ActionScriptOperator">--</span>;
+
+        <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">endIndex</span> <span class="ActionScriptOperator">&gt;=</span> <span class="ActionScriptDefault_Text">startIndex</span><span class="ActionScriptBracket/Brace">)</span>
+            <span class="ActionScriptReserved">return</span> <span class="ActionScriptDefault_Text">str</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">slice</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">startIndex</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">endIndex</span> <span class="ActionScriptOperator">+</span> 1<span class="ActionScriptBracket/Brace">)</span>;
+        <span class="ActionScriptReserved">else</span>
+            <span class="ActionScriptReserved">return</span> <span class="ActionScriptString">""</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+
+    <span class="ActionScriptComment">// ------------------------------------------------------------------------
+</span>
+<span class="ActionScriptBracket/Brace">}</span>
+
+<span class="ActionScriptComment">// ----------------------------------------------------------------------------
+</span>
+<span class="ActionScriptBracket/Brace">}</span>
+
+<span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">events</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">Event</span>;
+<span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">events</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">IOErrorEvent</span>;
+<span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">events</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">SecurityErrorEvent</span>;
+<span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">net</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">URLLoader</span>;
+<span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">net</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">URLLoaderDataFormat</span>;
+<span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">net</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">URLRequest</span>;
+<span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">utils</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">ByteArray</span>;
+
+<span class="ActionScriptComment">// ----------------------------------------------------------------------------
+</span>
+<span class="ActionScriptComment">// helper class to load files into memory
+</span>
+<span class="ActionScriptclass">class</span> <span class="ActionScriptDefault_Text">FilePreloader</span>
+<span class="ActionScriptBracket/Brace">{</span>
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">m_loadCB</span>:<span class="ActionScriptDefault_Text">Function</span>;
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">m_ldrArray</span>:<span class="ActionScriptDefault_Text">Array</span>;
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">m_filesToLoad</span>:<span class="ActionScriptDefault_Text">uint</span>;
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">m_loadEnd</span>:<span class="ActionScriptDefault_Text">Boolean</span>;
+    
+    <span class="ActionScriptComment">// ------------------------------------------------------------------------
+</span>    
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">FilePreloader</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">loadCB</span>:<span class="ActionScriptDefault_Text">Function</span><span class="ActionScriptBracket/Brace">)</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptDefault_Text">m_loadCB</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">loadCB</span>;
+        <span class="ActionScriptDefault_Text">m_ldrArray</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">Array</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+        <span class="ActionScriptDefault_Text">m_filesToLoad</span> <span class="ActionScriptOperator">=</span> 0;
+        <span class="ActionScriptDefault_Text">m_loadEnd</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptReserved">false</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+
+    <span class="ActionScriptComment">// ------------------------------------------------------------------------
+</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">load</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">filename</span>:<span class="ActionScriptDefault_Text">String</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">path</span>:<span class="ActionScriptDefault_Text">String</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptReserved">void</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">url</span>:<span class="ActionScriptDefault_Text">String</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">path</span> <span class="ActionScriptOperator">+</span> <span class="ActionScriptString">"/"</span> <span class="ActionScriptOperator">+</span> <span class="ActionScriptDefault_Text">filename</span>;
+        <span class="ActionScriptReserved">try</span> <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">loader</span>:<span class="ActionScriptDefault_Text">URLLoader</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">URLLoader</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptDefault_Text">m_ldrArray</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">push</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">[</span><span class="ActionScriptDefault_Text">loader</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">filename</span><span class="ActionScriptBracket/Brace">]</span><span class="ActionScriptBracket/Brace">)</span>;
+    
+            <span class="ActionScriptDefault_Text">loader</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">dataFormat</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">URLLoaderDataFormat</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">BINARY</span>;
+            <span class="ActionScriptDefault_Text">loader</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">addEventListener</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">SecurityErrorEvent</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">SECURITY_ERROR</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">errorCB</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptDefault_Text">loader</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">addEventListener</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">IOErrorEvent</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">IO_ERROR</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">errorCB</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptDefault_Text">loader</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">addEventListener</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">Event</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">COMPLETE</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">dataCB</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptDefault_Text">loader</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">load</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">URLRequest</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">url</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptDefault_Text">m_filesToLoad</span><span class="ActionScriptOperator">++</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+        <span class="ActionScriptReserved">catch</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">err</span>:<span class="ActionScriptDefault_Text">Error</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptBracket/Brace">{</span> <span class="ActionScriptDefault_Text">onError</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">filename</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">err</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">message</span><span class="ActionScriptBracket/Brace">)</span>; <span class="ActionScriptBracket/Brace">}</span>
+    <span class="ActionScriptBracket/Brace">}</span>
+
+    <span class="ActionScriptComment">// ------------------------------------------------------------------------
+</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">loadStart</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptReserved">void</span>    <span class="ActionScriptBracket/Brace">{</span> <span class="ActionScriptDefault_Text">m_loadEnd</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptReserved">false</span>; <span class="ActionScriptDefault_Text">m_filesToLoad</span> <span class="ActionScriptOperator">=</span> 0; <span class="ActionScriptBracket/Brace">}</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">loadEnd</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptReserved">void</span>        <span class="ActionScriptBracket/Brace">{</span> <span class="ActionScriptDefault_Text">m_loadEnd</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptReserved">true</span>;    <span class="ActionScriptBracket/Brace">}</span>
+
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">allFilesLoaded</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptDefault_Text">Boolean</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptReserved">return</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">m_loadEnd</span> <span class="ActionScriptOperator">&amp;&amp;</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">m_filesToLoad</span> <span class="ActionScriptOperator">==</span> 0<span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+
+    <span class="ActionScriptComment">// ------------------------------------------------------------------------
+</span>    
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">onLoad</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">url</span>:<span class="ActionScriptDefault_Text">String</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">data</span>:<span class="ActionScriptDefault_Text">ByteArray</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptReserved">void</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptDefault_Text">m_filesToLoad</span><span class="ActionScriptOperator">--</span>;
+        <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">m_loadCB</span> <span class="ActionScriptOperator">!=</span> <span class="ActionScriptReserved">null</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptDefault_Text">m_loadCB</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">url</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">data</span><span class="ActionScriptBracket/Brace">)</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+
+    <span class="ActionScriptComment">// ------------------------------------------------------------------------
+</span>
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">onError</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">url</span>:<span class="ActionScriptDefault_Text">String</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">errMsg</span>:<span class="ActionScriptDefault_Text">String</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptReserved">void</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">m_loadCB</span> <span class="ActionScriptOperator">!=</span> <span class="ActionScriptReserved">null</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptDefault_Text">m_loadCB</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">url</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptReserved">null</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">errMsg</span><span class="ActionScriptBracket/Brace">)</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+
+    <span class="ActionScriptComment">// ------------------------------------------------------------------------
+</span>    
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">errorCB</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">event</span>:<span class="ActionScriptDefault_Text">Event</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptReserved">void</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptDefault_Text">loadHandler</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">URLLoader</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">event</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">target</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">event</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">type</span><span class="ActionScriptBracket/Brace">)</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+    
+    <span class="ActionScriptComment">// ------------------------------------------------------------------------
+</span>    
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">dataCB</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">event</span>:<span class="ActionScriptDefault_Text">Event</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptReserved">void</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptDefault_Text">loadHandler</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">URLLoader</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">event</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">target</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+    
+    <span class="ActionScriptComment">// ------------------------------------------------------------------------
+</span>    
+    <span class="ActionScriptReserved">private</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">loadHandler</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">loader</span>:<span class="ActionScriptDefault_Text">URLLoader</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">errMsg</span>:<span class="ActionScriptDefault_Text">String</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptReserved">null</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptReserved">void</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptReserved">for</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">i</span>:<span class="ActionScriptDefault_Text">uint</span> <span class="ActionScriptOperator">=</span> 0; <span class="ActionScriptDefault_Text">i</span> <span class="ActionScriptOperator">&lt;</span> <span class="ActionScriptDefault_Text">m_ldrArray</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">length</span>; <span class="ActionScriptDefault_Text">i</span><span class="ActionScriptOperator">++</span><span class="ActionScriptBracket/Brace">)</span>
+        <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">m_ldrArray</span><span class="ActionScriptBracket/Brace">[</span><span class="ActionScriptDefault_Text">i</span><span class="ActionScriptBracket/Brace">]</span><span class="ActionScriptBracket/Brace">[</span>0<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">==</span> <span class="ActionScriptDefault_Text">loader</span><span class="ActionScriptBracket/Brace">)</span>
+            <span class="ActionScriptBracket/Brace">{</span>
+                <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">url</span>:<span class="ActionScriptDefault_Text">String</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">m_ldrArray</span><span class="ActionScriptBracket/Brace">[</span><span class="ActionScriptDefault_Text">i</span><span class="ActionScriptBracket/Brace">]</span><span class="ActionScriptBracket/Brace">[</span>1<span class="ActionScriptBracket/Brace">]</span>;
+                <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">errMsg</span> <span class="ActionScriptOperator">==</span> <span class="ActionScriptReserved">null</span><span class="ActionScriptBracket/Brace">)</span>    <span class="ActionScriptDefault_Text">onLoad</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">url</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">loader</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">data</span><span class="ActionScriptBracket/Brace">)</span>;
+                <span class="ActionScriptReserved">else</span>                <span class="ActionScriptDefault_Text">onError</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">url</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">errMsg</span><span class="ActionScriptBracket/Brace">)</span>;
+
+                <span class="ActionScriptDefault_Text">m_ldrArray</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">splice</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i</span><span class="ActionScriptOperator">,</span> 1<span class="ActionScriptBracket/Brace">)</span>;        <span class="ActionScriptComment">// removes element at index i
+</span>                <span class="ActionScriptReserved">return</span>;
+            <span class="ActionScriptBracket/Brace">}</span>
+        <span class="ActionScriptBracket/Brace">}</span>
+        <span class="ActionScriptComment">// should never get here
+</span>        <span class="ActionScriptDefault_Text">onError</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptString">""</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptString">"FilePreloader: load error!"</span><span class="ActionScriptBracket/Brace">)</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+
+    <span class="ActionScriptComment">// ------------------------------------------------------------------------
+</span>    
+<span class="ActionScriptBracket/Brace">}</span>
+</pre></body>
+</html>

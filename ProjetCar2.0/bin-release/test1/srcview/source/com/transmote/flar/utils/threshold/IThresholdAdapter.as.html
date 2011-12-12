@@ -1,0 +1,90 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>IThresholdAdapter.as</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../SourceStyles.css"/>
+</head>
+
+<body><pre><span class="ActionScriptComment">/* 
+* PROJECT: FLARManager
+* http://transmote.com/flar
+* Copyright 2009, Eric Socolofsky
+* --------------------------------------------------------------------------------
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+* 
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with this framework; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+* 
+* For further information please contact:
+*    &lt;eric(at)transmote.com&gt;
+*    http://transmote.com/flar
+* 
+*/</span>
+<span class="ActionScriptpackage">package</span> <span class="ActionScriptDefault_Text">com</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">transmote</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flar</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">utils</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">threshold</span> <span class="ActionScriptBracket/Brace">{</span>
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">display</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">BitmapData</span>;
+    
+    <span class="ActionScriptASDoc">/**
+     * Interface that defines how classes used for adaptive thresholding will interface with FLARManager.
+     * &lt;p&gt;
+     * Adaptive thresholding can result in better marker detection across a range of illumination.
+     * This is desirable for applications with low lighting, or in which the developer has little control
+     * over lighting conditions, such as with web applications.
+     * &lt;/p&gt;
+     * 
+     * @author    Eric Socolofsky
+     * @url        http://transmote.com/flar
+     */</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptinterface">interface</span> <span class="ActionScriptDefault_Text">IThresholdAdapter</span> <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptASDoc">/**
+         * Init from a name-value paired object that contains parameters parsed from XML.
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">initFromXML</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">paramsObj</span>:<span class="ActionScriptDefault_Text">Object</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptReserved">void</span>;
+        
+        <span class="ActionScriptASDoc">/**
+         * Calculate a new threshold.
+         * &lt;p&gt;
+         * This algorithm may just calculate a threshold and pass that back to FLARManager,
+         * which then passes it on to the tracker for internal thresholding.
+         * &lt;/p&gt;
+         * &lt;p&gt;
+         * However, this algorithm may also modify the source BitmapData directly.
+         * In this case, the algorithm must return -1, to tell the tracker to skip
+         * its internal thresholding algorithm, and use the source BitmapData as modified here.
+         * &lt;/p&gt;
+         * 
+         * @param    source                Source BitmapData used for computer vision analysis.
+         * @param    currentThreshold    Current threshold value.
+         * @return                        New threshold value.
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">calculateThreshold</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">source</span>:<span class="ActionScriptDefault_Text">BitmapData</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">currentThreshold</span>:<span class="ActionScriptDefault_Text">Number</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptDefault_Text">Number</span>;
+        
+        <span class="ActionScriptASDoc">/**
+         * Reset calculations.
+         * @param    currentThreshold    current threshold value.
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">resetCalculations</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">currentThreshold</span>:<span class="ActionScriptDefault_Text">Number</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptReserved">void</span>;
+        
+        <span class="ActionScriptASDoc">/**
+         * Returns &lt;code&gt;true&lt;/code&gt; if this threshold adapter should run every frame;
+         * Returns &lt;code&gt;false&lt;/code&gt; if this threshold adapter should run only when no markers are found.
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptReserved">get</span> <span class="ActionScriptDefault_Text">runsEveryFrame</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptDefault_Text">Boolean</span>;
+        
+        <span class="ActionScriptASDoc">/**
+         * Free this instance for garbage collection.
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">dispose</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptReserved">void</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+<span class="ActionScriptBracket/Brace">}</span></pre></body>
+</html>

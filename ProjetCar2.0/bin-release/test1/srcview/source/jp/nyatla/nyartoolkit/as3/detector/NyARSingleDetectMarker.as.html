@@ -1,0 +1,135 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>NyARSingleDetectMarker.as</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../SourceStyles.css"/>
+</head>
+
+<body><pre><span class="ActionScriptComment">/* 
+ * PROJECT: NyARToolkitAS3
+ * --------------------------------------------------------------------------------
+ * This work is based on the original ARToolKit developed by
+ *   Hirokazu Kato
+ *   Mark Billinghurst
+ *   HITLab, University of Washington, Seattle
+ * http://www.hitl.washington.edu/artoolkit/
+ *
+ * The NyARToolkitAS3 is AS3 edition ARToolKit class library.
+ * Copyright (C)2010 Ryo Iizuka
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
+ * 
+ * For further information please contact.
+ *    http://nyatla.jp/nyatoolkit/
+ *    &lt;airmail(at)ebony.plala.or.jp&gt; or &lt;nyatla(at)nyatla.jp&gt;
+ * 
+ */</span>
+<span class="ActionScriptpackage">package</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">detector</span> 
+<span class="ActionScriptBracket/Brace">{</span>
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">rasterfilter</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">rgb2bin</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">param</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">raster</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">raster</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">rgb</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">utils</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">pickup</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">squaredetect</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">transmat</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    
+<span class="ActionScriptASDoc">/**
+ * 画像からARCodeに最も一致するマーカーを1個検出し、その変換行列を計算するクラスです。
+ * 
+ */</span>
+<span class="ActionScriptReserved">public</span> <span class="ActionScriptclass">class</span> <span class="ActionScriptDefault_Text">NyARSingleDetectMarker</span> <span class="ActionScriptReserved">extends</span> <span class="ActionScriptDefault_Text">NyARCustomSingleDetectMarker</span>
+<span class="ActionScriptBracket/Brace">{</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">PF_ARTOOLKIT_COMPATIBLE</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptOperator">=</span>1;
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">PF_NYARTOOLKIT</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptOperator">=</span>2;
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">PF_NYARTOOLKIT_ARTOOLKIT_FITTING</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptOperator">=</span>100;
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">static</span> <span class="ActionScriptReserved">const</span> <span class="ActionScriptDefault_Text">PF_TEST2</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptOperator">=</span>201;
+    
+    <span class="ActionScriptASDoc">/**
+     * 検出するARCodeとカメラパラメータから、1個のARCodeを検出するNyARSingleDetectMarkerインスタンスを作ります。
+     * 
+     * @param i_param
+     * カメラパラメータを指定します。
+     * @param i_code
+     * 検出するARCodeを指定します。
+     * @param i_marker_width
+     * ARコードの物理サイズを、ミリメートルで指定します。
+     * @param i_input_raster_type
+     * 入力ラスタのピクセルタイプを指定します。この値は、INyARBufferReaderインタフェイスのgetBufferTypeの戻り値を指定します。
+     * @throws NyARException
+     */</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">NyARSingleDetectMarker</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_param</span>:<span class="ActionScriptDefault_Text">NyARParam</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">i_code</span>:<span class="ActionScriptDefault_Text">NyARCode</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">i_marker_width</span>:<span class="ActionScriptDefault_Text">Number</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">i_input_raster_type</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">i_profile_id</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptOperator">=</span><span class="ActionScriptDefault_Text">PF_NYARTOOLKIT</span><span class="ActionScriptBracket/Brace">)</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptReserved">super</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+        <span class="ActionScriptDefault_Text">initInstance2</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_param</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">i_code</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">i_marker_width</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">i_input_raster_type</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">i_profile_id</span><span class="ActionScriptBracket/Brace">)</span>;
+        <span class="ActionScriptReserved">return</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+    <span class="ActionScriptASDoc">/**
+     * コンストラクタから呼び出す関数です。
+     * @param i_ref_param
+     * @param i_ref_code
+     * @param i_marker_width
+     * @param i_input_raster_type
+     * @param i_profile_id
+     * @throws NyARException
+     */</span>
+    <span class="ActionScriptReserved">protected</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">initInstance2</span><span class="ActionScriptBracket/Brace">(</span>
+        <span class="ActionScriptDefault_Text">i_ref_param</span>:<span class="ActionScriptDefault_Text">NyARParam</span><span class="ActionScriptOperator">,</span>
+        <span class="ActionScriptDefault_Text">i_ref_code</span>:<span class="ActionScriptDefault_Text">NyARCode</span><span class="ActionScriptOperator">,</span>
+        <span class="ActionScriptDefault_Text">i_marker_width</span>:<span class="ActionScriptDefault_Text">Number</span><span class="ActionScriptOperator">,</span>
+        <span class="ActionScriptDefault_Text">i_input_raster_type</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptOperator">,</span>
+        <span class="ActionScriptDefault_Text">i_profile_id</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptReserved">void</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">th</span>:<span class="ActionScriptDefault_Text">NyARRasterFilter_ARToolkitThreshold</span><span class="ActionScriptOperator">=</span><span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">NyARRasterFilter_ARToolkitThreshold</span><span class="ActionScriptBracket/Brace">(</span>100<span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">i_input_raster_type</span><span class="ActionScriptBracket/Brace">)</span>;
+        <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">patt_inst</span>:<span class="ActionScriptDefault_Text">INyARColorPatt</span>;
+        <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">sqdetect_inst</span>:<span class="ActionScriptDefault_Text">NyARSquareContourDetector</span>;
+        <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">transmat_inst</span>:<span class="ActionScriptDefault_Text">INyARTransMat</span>;
+
+        <span class="ActionScriptReserved">switch</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_profile_id</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptReserved">case</span> <span class="ActionScriptDefault_Text">PF_NYARTOOLKIT</span>:<span class="ActionScriptComment">//default
+</span>            <span class="ActionScriptDefault_Text">patt_inst</span><span class="ActionScriptOperator">=</span><span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">NyARColorPatt_Perspective_O2</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_ref_code</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">getWidth</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">i_ref_code</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">getHeight</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptOperator">,</span>4<span class="ActionScriptOperator">,</span>25<span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptDefault_Text">sqdetect_inst</span><span class="ActionScriptOperator">=</span><span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">NyARSquareContourDetector_Rle</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_ref_param</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">getScreenSize</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptDefault_Text">transmat_inst</span><span class="ActionScriptOperator">=</span><span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">NyARTransMat</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_ref_param</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptReserved">break</span>;
+        <span class="ActionScriptReserved">default</span>:
+            <span class="ActionScriptReserved">throw</span> <span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">NyARException</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+        <span class="ActionScriptReserved">super</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">initInstance</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">patt_inst</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">sqdetect_inst</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">transmat_inst</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">th</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">i_ref_param</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">i_ref_code</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">i_marker_width</span><span class="ActionScriptBracket/Brace">)</span>;
+        
+    <span class="ActionScriptBracket/Brace">}</span>
+
+    <span class="ActionScriptASDoc">/**
+     * i_imageにマーカー検出処理を実行し、結果を記録します。
+     * 
+     * @param i_raster
+     * マーカーを検出するイメージを指定します。イメージサイズは、コンストラクタで指定i_paramの
+     * スクリーンサイズと一致し、かつi_input_raster_typeに指定した形式でなければいけません。
+     * @return マーカーが検出できたかを真偽値で返します。
+     * @throws NyARException
+     */</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">detectMarkerLite</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_raster</span>:<span class="ActionScriptDefault_Text">INyARRgbRaster</span><span class="ActionScriptOperator">,</span><span class="ActionScriptDefault_Text">i_threshold</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptDefault_Text">Boolean</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">NyARRasterFilter_ARToolkitThreshold</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">_tobin_filter</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptBracket/Brace">)</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">setThreshold</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_threshold</span><span class="ActionScriptBracket/Brace">)</span>;
+        <span class="ActionScriptReserved">return</span> <span class="ActionScriptReserved">super</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">detectMarkerLiteB</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_raster</span><span class="ActionScriptBracket/Brace">)</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+<span class="ActionScriptBracket/Brace">}</span>
+
+
+<span class="ActionScriptBracket/Brace">}</span></pre></body>
+</html>
