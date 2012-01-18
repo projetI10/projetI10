@@ -1,0 +1,125 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>FLARMatrixSmoother_AverageSimple.as</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../SourceStyles.css"/>
+</head>
+
+<body><pre><span class="ActionScriptComment">/* 
+ * PROJECT: FLARManager
+ * http://transmote.com/flar
+ * Copyright 2009, Eric Socolofsky
+ * --------------------------------------------------------------------------------
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this framework; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * 
+ * For further information please contact:
+ *    &lt;eric(at)transmote.com&gt;
+ *    http://transmote.com/flar
+ * 
+ */</span>
+<span class="ActionScriptpackage">package</span> <span class="ActionScriptDefault_Text">com</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">transmote</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flar</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">utils</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">smoother</span> <span class="ActionScriptBracket/Brace">{</span>
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">geom</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">Matrix3D</span>;
+    
+    <span class="ActionScriptASDoc">/**
+     * Averages a number of previous matrices to smooth motion of a model.
+     * 
+     * @author    Eric Socolofsky
+     * @url        http://transmote.com/flar
+     */</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptclass">class</span> <span class="ActionScriptDefault_Text">FLARMatrixSmoother_AverageSimple</span> <span class="ActionScriptReserved">implements</span> <span class="ActionScriptDefault_Text">IFLARMatrixSmoother</span> <span class="ActionScriptBracket/Brace">{</span>
+        
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">FLARMatrixSmoother_AverageSimple</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> {}
+        
+        <span class="ActionScriptASDoc">/**
+         * Init from a name-value paired object that contains parameters parsed from XML.
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">initFromXML</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">paramsObj</span>:<span class="ActionScriptDefault_Text">Object</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptReserved">void</span> <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptComment">// not implemented in this class.
+</span>        <span class="ActionScriptBracket/Brace">}</span>
+        
+        <span class="ActionScriptASDoc">/**
+         * Returns a Matrix3D that is the average of a Vector of Matrix3D instances.
+         * 
+         * @param    storedMatrices    Vector of stored matrices to average.  (&lt;code&gt;storedMatrices&lt;/code&gt; is not modified.)
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">smoothMatrices</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">storedMatrices</span>:<span class="ActionScriptDefault_Text">Vector</span><span class="ActionScriptBracket/Brace">.&lt;</span><span class="ActionScriptDefault_Text">Matrix3D</span><span class="ActionScriptBracket/Brace">&gt;</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptDefault_Text">Matrix3D</span> <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">smoothedMatrix</span>:<span class="ActionScriptDefault_Text">Matrix3D</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">Matrix3D</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">storedMatrix</span>:<span class="ActionScriptDefault_Text">Matrix3D</span>;
+            <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">smoothedRawData</span>:<span class="ActionScriptDefault_Text">Vector</span><span class="ActionScriptBracket/Brace">.&lt;</span><span class="ActionScriptDefault_Text">Number</span><span class="ActionScriptBracket/Brace">&gt;</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">Vector</span><span class="ActionScriptBracket/Brace">.&lt;</span><span class="ActionScriptDefault_Text">Number</span><span class="ActionScriptBracket/Brace">&gt;</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">[</span>0<span class="ActionScriptOperator">,</span>0<span class="ActionScriptOperator">,</span>0<span class="ActionScriptOperator">,</span>0<span class="ActionScriptOperator">,</span>0<span class="ActionScriptOperator">,</span>0<span class="ActionScriptOperator">,</span>0<span class="ActionScriptOperator">,</span>0<span class="ActionScriptOperator">,</span>0<span class="ActionScriptOperator">,</span>0<span class="ActionScriptOperator">,</span>0<span class="ActionScriptOperator">,</span>0<span class="ActionScriptOperator">,</span>0<span class="ActionScriptOperator">,</span>0<span class="ActionScriptOperator">,</span>0<span class="ActionScriptOperator">,</span>0<span class="ActionScriptBracket/Brace">]</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">storedRawData</span>:<span class="ActionScriptDefault_Text">Vector</span><span class="ActionScriptBracket/Brace">.&lt;</span><span class="ActionScriptDefault_Text">Number</span><span class="ActionScriptBracket/Brace">&gt;</span>;
+            
+            <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">numStoredMatrices</span>:<span class="ActionScriptDefault_Text">int</span> <span class="ActionScriptOperator">=</span> 0;    <span class="ActionScriptComment">// number of non-null matrices in storedMatrices
+</span>            <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">i</span>:<span class="ActionScriptDefault_Text">int</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">storedMatrices</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">length</span>;
+            <span class="ActionScriptReserved">while</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i</span><span class="ActionScriptOperator">--</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptBracket/Brace">{</span>
+                <span class="ActionScriptDefault_Text">storedMatrix</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">storedMatrices</span><span class="ActionScriptBracket/Brace">[</span><span class="ActionScriptDefault_Text">i</span><span class="ActionScriptBracket/Brace">]</span>;
+                <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptOperator">!</span><span class="ActionScriptDefault_Text">storedMatrix</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptBracket/Brace">{</span> <span class="ActionScriptReserved">continue</span>; <span class="ActionScriptBracket/Brace">}</span>
+                <span class="ActionScriptDefault_Text">storedRawData</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">storedMatrix</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">rawData</span>;
+                
+                <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>0<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">+=</span> <span class="ActionScriptDefault_Text">storedRawData</span><span class="ActionScriptBracket/Brace">[</span>0<span class="ActionScriptBracket/Brace">]</span>;
+                <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>1<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">+=</span> <span class="ActionScriptDefault_Text">storedRawData</span><span class="ActionScriptBracket/Brace">[</span>1<span class="ActionScriptBracket/Brace">]</span>;
+                <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>2<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">+=</span> <span class="ActionScriptDefault_Text">storedRawData</span><span class="ActionScriptBracket/Brace">[</span>2<span class="ActionScriptBracket/Brace">]</span>;
+                <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>3<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">+=</span> <span class="ActionScriptDefault_Text">storedRawData</span><span class="ActionScriptBracket/Brace">[</span>3<span class="ActionScriptBracket/Brace">]</span>;
+                <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>4<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">+=</span> <span class="ActionScriptDefault_Text">storedRawData</span><span class="ActionScriptBracket/Brace">[</span>4<span class="ActionScriptBracket/Brace">]</span>;
+                <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>5<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">+=</span> <span class="ActionScriptDefault_Text">storedRawData</span><span class="ActionScriptBracket/Brace">[</span>5<span class="ActionScriptBracket/Brace">]</span>;
+                <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>6<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">+=</span> <span class="ActionScriptDefault_Text">storedRawData</span><span class="ActionScriptBracket/Brace">[</span>6<span class="ActionScriptBracket/Brace">]</span>;
+                <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>7<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">+=</span> <span class="ActionScriptDefault_Text">storedRawData</span><span class="ActionScriptBracket/Brace">[</span>7<span class="ActionScriptBracket/Brace">]</span>;
+                <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>8<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">+=</span> <span class="ActionScriptDefault_Text">storedRawData</span><span class="ActionScriptBracket/Brace">[</span>8<span class="ActionScriptBracket/Brace">]</span>;
+                <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>9<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">+=</span> <span class="ActionScriptDefault_Text">storedRawData</span><span class="ActionScriptBracket/Brace">[</span>9<span class="ActionScriptBracket/Brace">]</span>;
+                <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>10<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">+=</span> <span class="ActionScriptDefault_Text">storedRawData</span><span class="ActionScriptBracket/Brace">[</span>10<span class="ActionScriptBracket/Brace">]</span>;
+                <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>11<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">+=</span> <span class="ActionScriptDefault_Text">storedRawData</span><span class="ActionScriptBracket/Brace">[</span>11<span class="ActionScriptBracket/Brace">]</span>;
+                <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>12<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">+=</span> <span class="ActionScriptDefault_Text">storedRawData</span><span class="ActionScriptBracket/Brace">[</span>12<span class="ActionScriptBracket/Brace">]</span>;
+                <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>13<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">+=</span> <span class="ActionScriptDefault_Text">storedRawData</span><span class="ActionScriptBracket/Brace">[</span>13<span class="ActionScriptBracket/Brace">]</span>;
+                <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>14<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">+=</span> <span class="ActionScriptDefault_Text">storedRawData</span><span class="ActionScriptBracket/Brace">[</span>14<span class="ActionScriptBracket/Brace">]</span>;
+                <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>15<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">+=</span> <span class="ActionScriptDefault_Text">storedRawData</span><span class="ActionScriptBracket/Brace">[</span>15<span class="ActionScriptBracket/Brace">]</span>;
+                
+                <span class="ActionScriptDefault_Text">numStoredMatrices</span><span class="ActionScriptOperator">++</span>;
+            <span class="ActionScriptBracket/Brace">}</span>
+            
+            <span class="ActionScriptReserved">if</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">numStoredMatrices</span> <span class="ActionScriptOperator">==</span> 0<span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptBracket/Brace">{</span>
+                <span class="ActionScriptReserved">return</span> <span class="ActionScriptReserved">new</span> <span class="ActionScriptDefault_Text">Matrix3D</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+            <span class="ActionScriptBracket/Brace">}</span>
+            
+            <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>0<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">/=</span> <span class="ActionScriptDefault_Text">numStoredMatrices</span>;
+            <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>1<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">/=</span> <span class="ActionScriptDefault_Text">numStoredMatrices</span>;
+            <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>2<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">/=</span> <span class="ActionScriptDefault_Text">numStoredMatrices</span>;
+            <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>3<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">/=</span> <span class="ActionScriptDefault_Text">numStoredMatrices</span>;
+            <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>4<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">/=</span> <span class="ActionScriptDefault_Text">numStoredMatrices</span>;
+            <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>5<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">/=</span> <span class="ActionScriptDefault_Text">numStoredMatrices</span>;
+            <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>6<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">/=</span> <span class="ActionScriptDefault_Text">numStoredMatrices</span>;
+            <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>7<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">/=</span> <span class="ActionScriptDefault_Text">numStoredMatrices</span>;
+            <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>8<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">/=</span> <span class="ActionScriptDefault_Text">numStoredMatrices</span>;
+            <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>9<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">/=</span> <span class="ActionScriptDefault_Text">numStoredMatrices</span>;
+            <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>10<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">/=</span> <span class="ActionScriptDefault_Text">numStoredMatrices</span>;
+            <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>11<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">/=</span> <span class="ActionScriptDefault_Text">numStoredMatrices</span>;
+            <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>12<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">/=</span> <span class="ActionScriptDefault_Text">numStoredMatrices</span>;
+            <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>13<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">/=</span> <span class="ActionScriptDefault_Text">numStoredMatrices</span>;
+            <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>14<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">/=</span> <span class="ActionScriptDefault_Text">numStoredMatrices</span>;
+            <span class="ActionScriptDefault_Text">smoothedRawData</span><span class="ActionScriptBracket/Brace">[</span>15<span class="ActionScriptBracket/Brace">]</span> <span class="ActionScriptOperator">/=</span> <span class="ActionScriptDefault_Text">numStoredMatrices</span>;
+            
+            <span class="ActionScriptDefault_Text">smoothedMatrix</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">rawData</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">smoothedRawData</span>;
+            <span class="ActionScriptReserved">return</span> <span class="ActionScriptDefault_Text">smoothedMatrix</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+        
+        <span class="ActionScriptASDoc">/**
+         * Halts all processes and frees this instance for garbage collection.
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">dispose</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptReserved">void</span> <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptComment">//
+</span>        <span class="ActionScriptBracket/Brace">}</span>
+    <span class="ActionScriptBracket/Brace">}</span>
+<span class="ActionScriptBracket/Brace">}</span></pre></body>
+</html>

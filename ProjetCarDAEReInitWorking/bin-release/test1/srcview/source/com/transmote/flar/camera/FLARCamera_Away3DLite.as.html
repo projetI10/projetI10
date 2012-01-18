@@ -1,0 +1,93 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>FLARCamera_Away3DLite.as</title>
+<link rel="stylesheet" type="text/css" href="../../../../../SourceStyles.css"/>
+</head>
+
+<body><pre><span class="ActionScriptComment">/* 
+* PROJECT: FLARManager
+* http://transmote.com/flar
+* Copyright 2009, Eric Socolofsky
+* --------------------------------------------------------------------------------
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+* 
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with this framework; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+* 
+* For further information please contact:
+*    &lt;eric(at)transmote.com&gt;
+*    http://transmote.com/flar
+*/</span>
+<span class="ActionScriptpackage">package</span> <span class="ActionScriptDefault_Text">com</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">transmote</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flar</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">camera</span> <span class="ActionScriptBracket/Brace">{</span>
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">away3dlite</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">cameras</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">Camera3D</span>;
+    
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">com</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">transmote</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flar</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">FLARManager</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">com</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">transmote</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flar</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">utils</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">geom</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">AwayGeomUtils</span>;
+    
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">geom</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">Matrix3D</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">flash</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">geom</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">Rectangle</span>;
+    
+    <span class="ActionScriptASDoc">/**
+     * Extends Away Lite's Camera3D class to set up a scene correctly
+     * for projection of 3D objects transformed by a tracker managed by FLARManager.
+     *  
+     * @author    Eric Socolofsky
+     * @url        http://transmote.com/flar
+     */</span>
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptclass">class</span> <span class="ActionScriptDefault_Text">FLARCamera_Away3DLite</span> <span class="ActionScriptReserved">extends</span> <span class="ActionScriptDefault_Text">Camera3D</span> <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptReserved">private</span> <span class="ActionScriptvar">var</span> <span class="ActionScriptDefault_Text">flarProjectionMatrix</span>:<span class="ActionScriptDefault_Text">Matrix3D</span>;
+        
+        <span class="ActionScriptASDoc">/**
+         * Constructor.
+         * 
+         * @param    flarManager        A reference to the FLARManager instance used by this application.
+         * @param    viewportSize    A Rectangle that describes the viewport size for the application.
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">FLARCamera_Away3DLite</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">flarManager</span>:<span class="ActionScriptDefault_Text">FLARManager</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">viewportSize</span>:<span class="ActionScriptDefault_Text">Rectangle</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptReserved">super</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>;
+            
+            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">x</span> <span class="ActionScriptOperator">=</span> 0;
+            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">y</span> <span class="ActionScriptOperator">=</span> 0;
+            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">z</span> <span class="ActionScriptOperator">=</span> 0;
+
+            <span class="ActionScriptReserved">switch</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">flarManager</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">trackerId</span><span class="ActionScriptBracket/Brace">)</span> <span class="ActionScriptBracket/Brace">{</span>
+                <span class="ActionScriptReserved">case</span> <span class="ActionScriptDefault_Text">FLARManager</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">TRACKER_ID_FLARTOOLKIT</span> :
+                    <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">init_FLARToolkit</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">flarManager</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">viewportSize</span><span class="ActionScriptBracket/Brace">)</span>;
+                    <span class="ActionScriptReserved">break</span>;
+                <span class="ActionScriptReserved">case</span> <span class="ActionScriptDefault_Text">FLARManager</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">TRACKER_ID_FLARE</span> :
+                    <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">init_flare</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">flarManager</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">viewportSize</span><span class="ActionScriptBracket/Brace">)</span>;
+                    <span class="ActionScriptReserved">break</span>;
+            <span class="ActionScriptBracket/Brace">}</span>
+        <span class="ActionScriptBracket/Brace">}</span>
+        
+        <span class="ActionScriptASDoc">/**
+         * Returns the 3d matrix representing the camera projection for the view.
+         * 
+         * @see away3dlite.containers.View3D#render()
+         */</span>
+        <span class="ActionScriptReserved">public</span> <span class="ActionScriptReserved">override</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptReserved">get</span> <span class="ActionScriptDefault_Text">projectionMatrix3D</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptDefault_Text">Matrix3D</span> <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptReserved">return</span> <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flarProjectionMatrix</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+        
+        <span class="ActionScriptReserved">private</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">init_FLARToolkit</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">flarManager</span>:<span class="ActionScriptDefault_Text">FLARManager</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">viewportSize</span>:<span class="ActionScriptDefault_Text">Rectangle</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptReserved">void</span> <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flarProjectionMatrix</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">flarManager</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">getProjectionMatrix</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">FLARManager</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">FRAMEWORK_ID_AWAY_LITE</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">viewportSize</span><span class="ActionScriptBracket/Brace">)</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+        
+        <span class="ActionScriptReserved">private</span> <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">init_flare</span> <span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">flarManager</span>:<span class="ActionScriptDefault_Text">FLARManager</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">viewportSize</span>:<span class="ActionScriptDefault_Text">Rectangle</span><span class="ActionScriptBracket/Brace">)</span> :<span class="ActionScriptReserved">void</span> <span class="ActionScriptBracket/Brace">{</span>
+            <span class="ActionScriptReserved">this</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">flarProjectionMatrix</span> <span class="ActionScriptOperator">=</span> <span class="ActionScriptDefault_Text">flarManager</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">getProjectionMatrix</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">FLARManager</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">FRAMEWORK_ID_AWAY_LITE</span><span class="ActionScriptOperator">,</span> <span class="ActionScriptDefault_Text">viewportSize</span><span class="ActionScriptBracket/Brace">)</span>;
+        <span class="ActionScriptBracket/Brace">}</span>
+    <span class="ActionScriptBracket/Brace">}</span>
+<span class="ActionScriptBracket/Brace">}</span></pre></body>
+</html>

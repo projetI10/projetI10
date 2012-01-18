@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
+
+  <Folder>
+    <name>leftbackwheel</name>
+    <description>Created with &lt;a href="http://sketchup.google.com"&gt;Google SketchUp&lt;/a&gt;</description>
+    <visibility>1</visibility>
+    <LookAt>
+      <heading>3.219172296578</heading>
+      <tilt>60.3236148796</tilt>
+      <latitude>48.86699999844</latitude>
+      <longitude>2.333003075489</longitude>
+      <range>6.276999441508</range>
+      <altitude>3.899490782602</altitude>
+    </LookAt>
+    <Folder>
+      <name>Tour</name>
+      <Placemark>
+        <name>Scene 1</name>
+        <visibility>1</visibility>
+        <LookAt>
+          <heading>3.219172296578</heading>
+          <tilt>60.3236148796</tilt>
+          <latitude>48.86699999844</latitude>
+          <longitude>2.333003075489</longitude>
+          <range>6.276999441508</range>
+          <altitude>3.899490782602</altitude>
+        </LookAt>
+      </Placemark>
+    </Folder>
+    <Placemark>
+      <name>Model</name>
+      <description></description>
+      <Style id="default"/>
+      <Model>
+        <altitudeMode>relativeToGround</altitudeMode>
+        <Location>
+          <latitude>48.867</latitude>
+          <longitude>2.333</longitude>
+          <altitude>0</altitude>
+        </Location>
+        <Orientation>
+          <heading>-0</heading>
+          <tilt>0</tilt>
+          <roll>0</roll>
+        </Orientation>
+        <Scale>
+          <x>1</x>
+          <y>1</y>
+          <z>1</z>
+        </Scale>
+        <Link>
+          <href>models/untitled.dae</href>
+        </Link>
+      </Model>
+    </Placemark>
+  </Folder>
+
+</kml>

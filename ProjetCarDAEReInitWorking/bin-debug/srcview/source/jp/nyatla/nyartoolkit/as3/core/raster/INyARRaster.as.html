@@ -1,0 +1,49 @@
+<!-- saved from url=(0014)about:internet -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>INyARRaster.as</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../../SourceStyles.css"/>
+</head>
+
+<body><pre><span class="ActionScriptpackage">package</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">raster</span> <span class="ActionScriptBracket/Brace">{</span>
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">rasterreader</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;
+    <span class="ActionScriptReserved">import</span> <span class="ActionScriptDefault_Text">jp</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyatla</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">nyartoolkit</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">as3</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">core</span><span class="ActionScriptOperator">.</span><span class="ActionScriptDefault_Text">types</span><span class="ActionScriptOperator">.</span><span class="ActionScriptOperator">*</span>;            
+
+    <span class="ActionScriptReserved">public</span> <span class="ActionScriptinterface">interface</span> <span class="ActionScriptDefault_Text">INyARRaster</span>
+    <span class="ActionScriptBracket/Brace">{</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">getWidth</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptDefault_Text">int</span>;
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">getHeight</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptDefault_Text">int</span>;
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">getSize</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptDefault_Text">NyARIntSize</span>;
+        <span class="ActionScriptASDoc">/**
+         * バッファオブジェクトを返します。
+         * @return
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">getBuffer</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptDefault_Text">Object</span>;
+        <span class="ActionScriptASDoc">/**
+         * バッファオブジェクトのタイプを返します。
+         * @return
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">getBufferType</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptDefault_Text">int</span>;
+        <span class="ActionScriptASDoc">/**
+         * バッファのタイプがi_type_valueであるか、チェックします。
+         * この値は、NyARBufferTypeに定義された定数値です。
+         * @param i_type_value
+         * @return
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">isEqualBufferType</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_type_value</span>:<span class="ActionScriptDefault_Text">int</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptDefault_Text">Boolean</span>;
+        <span class="ActionScriptASDoc">/**
+         * getBufferがオブジェクトを返せるかの真偽値です。
+         * @return
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">hasBuffer</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptDefault_Text">Boolean</span>;
+        <span class="ActionScriptASDoc">/**
+         * i_ref_bufをラップします。できる限り整合性チェックを行います。
+         * バッファの再ラッピングが可能な関数のみ、この関数を実装してください。
+         * @param i_ref_buf
+         */</span>
+        <span class="ActionScriptfunction">function</span> <span class="ActionScriptDefault_Text">wrapBuffer</span><span class="ActionScriptBracket/Brace">(</span><span class="ActionScriptDefault_Text">i_ref_buf</span>:<span class="ActionScriptDefault_Text">Object</span><span class="ActionScriptBracket/Brace">)</span>:<span class="ActionScriptReserved">void</span>;
+    <span class="ActionScriptBracket/Brace">}</span>
+<span class="ActionScriptBracket/Brace">}</span></pre></body>
+</html>
